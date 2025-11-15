@@ -79,7 +79,9 @@
     "testEnvironment": "jsdom",
     "testPathIgnorePatterns": [
       "<rootDir>/src/__tests__/index.ts",
-      "<rootDir>/src/__tests__/setup.ts"
+      "<rootDir>/src/__tests__/setup.ts",
+      "<rootDir>/src/__tests__/utils/",
+      "<rootDir>/src/__tests__/README.md"
     ],
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
