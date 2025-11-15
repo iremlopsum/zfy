@@ -13,6 +13,8 @@
   ],
   "scripts": {
     "test": "jest --updateSnapshot --verbose",
+    "test:coverage": "jest --coverage --coverageReporters=html --coverageReporters=text-summary",
+    "test:watch": "jest --watch",
     "type": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
     "pre-commit": "yarn lint && yarn type && yarn test",
@@ -81,7 +83,8 @@
       "<rootDir>/src/__tests__/index.ts",
       "<rootDir>/src/__tests__/setup.ts",
       "<rootDir>/src/__tests__/utils/",
-      "<rootDir>/src/__tests__/README.md"
+      "<rootDir>/src/__tests__/README.md",
+      "<rootDir>/src/__tests__/coverage/coverage-goals.md"
     ],
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
@@ -89,7 +92,22 @@
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/src/__tests__/setup.ts"
-    ]
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/**/*.test.{ts,tsx}",
+      "!src/**/__tests__/**",
+      "!src/**/index.ts",
+      "!src/types.ts"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 90,
+        "branches": 85,
+        "functions": 90,
+        "lines": 90
+      }
+    }
   },
   "husky": {
     "hooks": {

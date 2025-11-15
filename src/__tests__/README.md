@@ -19,8 +19,14 @@ __tests__/
 │       ├── logger-middleware.test.ts
 │       ├── persist-middleware.test.ts
 │       └── subscribe-middleware.test.ts
+├── integration/                   # Real-world integration tests
+│   └── real-world-scenarios.test.tsx
+├── advanced/                      # Advanced scenario tests
+│   └── memory-and-performance.test.ts
 ├── performance/                   # Performance and stress tests
 │   └── store-performance.test.ts
+├── coverage/                      # Coverage goals and analysis
+│   └── coverage-goals.md
 ├── utils/                         # Test utilities
 │   └── test-helpers.ts
 └── index.ts                       # Shared test fixtures
@@ -33,39 +39,50 @@ __tests__/
 
 Tests for individual functions and modules in isolation.
 
-- **Invariant & Error Handling** (21 tests): InvariantError class and error throwing
-- **Validations** (30 tests): Input validation for all public APIs
-- **Middlewares** (50 tests): Logger, persist, subscribe middleware functionality
+- **Invariant & Error Handling** (27 tests): InvariantError class and error throwing
+- **Validations** (94 tests): Input validation for all public APIs
+- **Middlewares** (39 tests): Logger, persist, subscribe middleware functionality
 - **Middleware Composition** (19 tests): How middlewares work together
 
-### Integration Tests (23 tests)
+### Core Tests (72 tests)
 
 Tests for core store functionality and combinations of features.
 
 - **Create Store** (23 tests): Store creation, middleware integration, error scenarios
 - **Init Stores** (15 tests): Multi-store management, rehydration, reset functionality
-
-### Component Tests (17 tests)
-
-Tests for React components and hooks.
-
 - **PersistGate** (17 tests): Component rendering, loader states, error handling
 - **useRehydrate** (17 tests): Hook behavior, edge cases, cleanup
 
-### Edge Case Tests (48 tests)
+### Integration Tests (10 tests)
 
-Tests for error scenarios, edge cases, and concurrent operations.
+Tests for real-world usage patterns and complex scenarios.
 
-- **Storage Failures** (9 tests): Read/write/remove errors, quota exceeded
-- **Concurrent Operations** (8 tests): Race conditions, rapid updates
-- **Multiple Stores** (various): Complex multi-store scenarios
+- **Multi-Store Applications** (2 tests): Auth flows, form state management
+- **Data Fetching & Caching** (2 tests): Cache patterns, optimistic updates
+- **Component Lifecycle** (2 tests): Mount/unmount, async operations
+- **PersistGate Scenarios** (2 tests): Navigation, multi-step wizards
+- **Error Recovery** (2 tests): Corruption recovery, conflict resolution
 
-### Performance Tests (15 tests)
+### Advanced Tests (14 tests)
 
-Tests for performance characteristics and stress testing.
+Tests for memory leaks, performance degradation, and edge cases.
 
-- **Store Operations**: Creation, updates, reads, resets
-- **Stress Tests**: Extreme load, large state, deep nesting
+- **Memory Leak Detection** (3 tests): Subscription cleanup, store lifecycle
+- **Performance Degradation** (3 tests): Long-running stability
+- **Long-Running Scenarios** (2 tests): Thousands of operations
+- **Edge Case Resilience** (4 tests): Circular refs, deep nesting, error recovery
+- **Concurrent Access** (2 tests): High-frequency operations, interleaved updates
+
+### Performance & Stress Tests (16 tests)
+
+Benchmarks and stress tests with performance thresholds.
+
+- **Store Operations** (8 tests): Creation, updates, reads, resets
+- **Stress Tests** (4 tests): Extreme load, large state, deep nesting
+- **Memory Efficiency** (1 test): Memory leak detection
+- **Multi-Store Performance** (3 tests): Multiple stores, subscriptions
+
+**Total: 213 tests**
 
 ## Test Utilities
 
@@ -313,6 +330,42 @@ yarn test --verbose
 
 Remove `mockImplementation()` from console spies temporarily.
 
+## Test Evolution
+
+This test suite has evolved through multiple improvement phases:
+
+### Phase 1: Critical Issues & Unit Tests
+- Fixed `act()` warnings in React component tests
+- Added comprehensive unit tests for internal modules
+- 117 tests → Established foundation
+
+### Phase 2: Test Quality & Consistency
+- Removed brittle `expect.assertions()` calls
+- Standardized mock cleanup patterns
+- Improved test organization with `describe` blocks
+- Enhanced test descriptions for clarity
+
+### Phase 3: Edge Cases & Coverage
+- Added storage failure scenarios
+- Implemented concurrent operation tests
+- Expanded component and hook test coverage
+- Added validation error tests
+- 173 tests → Robust error handling
+
+### Phase 4: Test Utilities & Performance
+- Created reusable test helper library
+- Added 16 performance and stress tests
+- Implemented memory leak detection
+- Documented entire test suite
+- 189 tests → Performance benchmarks
+
+### Phase 5: Integration & Advanced Scenarios
+- Added 10 real-world integration tests
+- Implemented 14 advanced scenario tests
+- Added test coverage configuration
+- Optimized test reliability
+- **213 tests → Production-ready**
+
 ## Contributing
 
 When adding new tests:
@@ -323,3 +376,5 @@ When adding new tests:
 4. Update this README if needed
 5. Ensure all tests pass
 6. Check TypeScript and linting errors
+7. Maintain or improve test coverage
+8. Consider performance implications
