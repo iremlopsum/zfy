@@ -7,7 +7,7 @@ import createStore from '../core/create-store'
 import { data, SyncStorage, AsyncStorage, rehydratedData } from '.'
 
 describe('🚪 Core > PersistGate:', () => {
-  it('renders loader and rehydrates with sync storage', async () => {
+  it('renders loader and children after rehydration with sync storage', async () => {
     const loader = jest.fn()
     const store = createStore('jest', data, {
       persist: { storage: createJSONStorage(() => SyncStorage) },
@@ -26,11 +26,9 @@ describe('🚪 Core > PersistGate:', () => {
     expect(container).toMatchSnapshot()
     expect(loader).toHaveBeenCalled()
     expect(store.getState().data).toEqual(rehydratedData)
-
-    expect.assertions(3)
   })
 
-  it('renders loader and rehydrates with async storage', async () => {
+  it('renders loader and children after rehydration with async storage', async () => {
     const loader = jest.fn()
     const store = createStore('jest', data, {
       persist: { storage: createJSONStorage(() => AsyncStorage) },

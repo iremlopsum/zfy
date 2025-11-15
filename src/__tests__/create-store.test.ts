@@ -7,200 +7,228 @@ import createStore from '../core/create-store'
 type StoreDataType = typeof data
 
 describe('🐣 Core > createStore():', () => {
-  it('validates config', () => {
-    // @ts-expect-error
-    expect(() => createStore()).toThrow(
-      'You need to provide a unique store name string to createStore() as its first argument.'
-    )
-    // @ts-expect-error
-    expect(() => createStore(undefined, data)).toThrow(
-      'You need to provide a unique store name string to createStore() as its first argument.'
-    )
-    // @ts-expect-error
-    expect(() => createStore('jest')).toThrow(
-      'You need to provide some initial data to your jest store via createStore() 2nd argument.'
-    )
+  describe('validation', () => {
+    it('throws error when store name is not provided', () => {
+      // @ts-expect-error - testing invalid input
+      expect(() => createStore()).toThrow(
+        'You need to provide a unique store name string to createStore() as its first argument.'
+      )
+    })
 
-    expect.assertions(3)
+    it('throws error when store name is undefined', () => {
+      // @ts-expect-error - testing invalid input
+      expect(() => createStore(undefined, data)).toThrow(
+        'You need to provide a unique store name string to createStore() as its first argument.'
+      )
+    })
+
+    it('throws error when initial data is not provided', () => {
+      // @ts-expect-error - testing invalid input
+      expect(() => createStore('jest')).toThrow(
+        'You need to provide some initial data to your jest store via createStore() 2nd argument.'
+      )
+    })
   })
 
-  it('works with minimal config', () => {
+  it('creates store with minimal configuration', () => {
     const store = createStore('jest', data)
     assertStoreContent({ store, expectedData: data })
-
-    expect.assertions(4)
   })
 
-  it('works with logger middleware enabled', () => {
-    const consoleGroup = jest.spyOn(console, 'group').mockImplementation()
-    const consoleDebug = jest.spyOn(console, 'debug').mockImplementation()
+  describe('logger middleware', () => {
+    let consoleGroup: jest.SpyInstance
+    let consoleDebug: jest.SpyInstance
 
-    // @ts-expect-error
-    expect(() => createStore('jest', data, { log: 1 })).toThrow(
-      "You need to provide a boolean to jest's createStore() options.log, 1 is not a boolean."
-    )
-
-    const store = createStore('jest', data, { log: true })
-    assertStoreContent({ store, expectedData: data })
-
-    store.getState().update((state) => {
-      state.file = rehydratedData.file
+    beforeEach(() => {
+      consoleGroup = jest.spyOn(console, 'group').mockImplementation()
+      consoleDebug = jest.spyOn(console, 'debug').mockImplementation()
     })
 
-    expect(consoleGroup).toHaveBeenCalledWith(
-      '%c🗂 JEST STORE UPDATED',
-      'font-weight:bold'
-    )
-    expect(consoleDebug).toHaveBeenCalledWith(
-      '%cprevState',
-      'font-weight:bold; color: #9E9E9E',
-      data
-    )
-    expect(consoleDebug).toHaveBeenCalledWith(
-      '%cpayload',
-      'font-weight:bold; color: #27A3F7',
-      rehydratedData
-    )
-    expect(consoleDebug).toHaveBeenCalledWith(
-      '%cnewState',
-      'font-weight:bold; color: #C6E40A',
-      rehydratedData
-    )
+    afterEach(() => {
+      consoleGroup.mockRestore()
+      consoleDebug.mockRestore()
+    })
 
-    expect.assertions(9)
-    consoleGroup.mockRestore()
-    consoleDebug.mockRestore()
+    it('throws error when log option is not a boolean', () => {
+      // @ts-expect-error - testing invalid input
+      expect(() => createStore('jest', data, { log: 1 })).toThrow(
+        "You need to provide a boolean to jest's createStore() options.log, 1 is not a boolean."
+      )
+    })
+
+    it('logs state updates when enabled', () => {
+      const store = createStore('jest', data, { log: true })
+      assertStoreContent({ store, expectedData: data })
+
+      store.getState().update((state) => {
+        state.file = rehydratedData.file
+      })
+
+      expect(consoleGroup).toHaveBeenCalledWith(
+        '%c🗂 JEST STORE UPDATED',
+        'font-weight:bold'
+      )
+      expect(consoleDebug).toHaveBeenCalledWith(
+        '%cprevState',
+        'font-weight:bold; color: #9E9E9E',
+        data
+      )
+      expect(consoleDebug).toHaveBeenCalledWith(
+        '%cpayload',
+        'font-weight:bold; color: #27A3F7',
+        rehydratedData
+      )
+      expect(consoleDebug).toHaveBeenCalledWith(
+        '%cnewState',
+        'font-weight:bold; color: #C6E40A',
+        rehydratedData
+      )
+    })
   })
 
-  it('works with subscribe middleware enabled', () => {
-    const listener = jest.fn()
-
-    // @ts-expect-error
-    expect(() => createStore('jest', data, { subscribe: 1 })).toThrow(
-      "You need to provide a boolean to jest's createStore() options.subscribe, 1 is not a boolean."
-    )
-
-    const store = createStore<StoreDataType>('jest', data, {
-      subscribe: true,
-    })
-    const unsubscribe = store.subscribeWithSelector?.(
-      (state: any) => state.data.file,
-      listener,
-      { fireImmediately: true }
-    )
-
-    expect(unsubscribe).toBeInstanceOf(Function)
-    expect(listener).toHaveBeenCalledWith(data.file, data.file)
-
-    store.getState().update((state) => {
-      state.file = rehydratedData.file
+  describe('subscribe middleware', () => {
+    it('throws error when subscribe option is not a boolean', () => {
+      // @ts-expect-error - testing invalid input
+      expect(() => createStore('jest', data, { subscribe: 1 })).toThrow(
+        "You need to provide a boolean to jest's createStore() options.subscribe, 1 is not a boolean."
+      )
     })
 
-    expect(listener).toHaveBeenCalledWith(rehydratedData.file, data.file)
+    it('enables subscribeWithSelector when enabled', () => {
+      const listener = jest.fn()
+      const store = createStore<StoreDataType>('jest', data, {
+        subscribe: true,
+      })
+      
+      const unsubscribe = store.subscribeWithSelector?.(
+        (state: any) => state.data.file,
+        listener,
+        { fireImmediately: true }
+      )
 
-    unsubscribe?.()
+      expect(unsubscribe).toBeInstanceOf(Function)
+      expect(listener).toHaveBeenCalledWith(data.file, data.file)
 
-    expect.assertions(4)
+      store.getState().update((state) => {
+        state.file = rehydratedData.file
+      })
+
+      expect(listener).toHaveBeenCalledWith(rehydratedData.file, data.file)
+
+      unsubscribe?.()
+    })
   })
 
-  it('works with persist middleware enabled', () => {
-    // @ts-expect-error
-    expect(() => createStore('jest', data, { persist: true })).toThrow(
-      "You need to provide an object to jest's createStore() options.persist. true is not an object."
-    )
-    // @ts-expect-error
-    expect(() => createStore('jest', data, { persist: {} })).toThrow(
-      "You need to provide the storage to jest's createStore() options.persist."
-    )
-
-    const store = createStore('jest', data, {
-      persist: { storage: createJSONStorage(() => SyncStorage) },
+  describe('persist middleware', () => {
+    it('throws error when persist option is not an object', () => {
+      // @ts-expect-error - testing invalid input
+      expect(() => createStore('jest', data, { persist: true })).toThrow(
+        "You need to provide an object to jest's createStore() options.persist. true is not an object."
+      )
     })
-    assertStoreContent({ store, expectedData: rehydratedData })
 
-    expect.assertions(6)
+    it('throws error when storage is not provided', () => {
+      // @ts-expect-error - testing invalid input
+      expect(() => createStore('jest', data, { persist: {} })).toThrow(
+        "You need to provide the storage to jest's createStore() options.persist."
+      )
+    })
+
+    it('rehydrates data from storage when enabled', () => {
+      const store = createStore('jest', data, {
+        persist: { storage: createJSONStorage(() => SyncStorage) },
+      })
+      
+      assertStoreContent({ store, expectedData: rehydratedData })
+    })
   })
 
-  it('works with all provided middlewares enabled', () => {
-    const listener = jest.fn()
-    const consoleGroup = jest.spyOn(console, 'group').mockImplementation()
-    const consoleDebug = jest.spyOn(console, 'debug').mockImplementation()
+  describe('middleware combination', () => {
+    let consoleGroup: jest.SpyInstance
+    let consoleDebug: jest.SpyInstance
 
-    const store = createStore<StoreDataType>('jest', data, {
-      persist: { storage: createJSONStorage(() => SyncStorage) },
-      subscribe: true,
-      log: true,
-    })
-    const unsubscribe = store.subscribeWithSelector?.(
-      (state: any) => state.data.file,
-      listener
-    )
-
-    expect(unsubscribe).toBeInstanceOf(Function)
-    assertStoreContent({ store, expectedData: rehydratedData })
-
-    store.getState().update((state) => {
-      state.file = data.file
+    beforeEach(() => {
+      consoleGroup = jest.spyOn(console, 'group').mockImplementation()
+      consoleDebug = jest.spyOn(console, 'debug').mockImplementation()
     })
 
-    expect(listener).toHaveBeenCalledWith(data.file, rehydratedData.file)
-
-    expect(consoleGroup).toHaveBeenCalledWith(
-      '%c🗂 JEST STORE UPDATED',
-      'font-weight:bold'
-    )
-    expect(consoleDebug).toHaveBeenCalledWith(
-      '%cprevState',
-      'font-weight:bold; color: #9E9E9E',
-      rehydratedData
-    )
-    expect(consoleDebug).toHaveBeenCalledWith(
-      '%cpayload',
-      'font-weight:bold; color: #27A3F7',
-      data
-    )
-    expect(consoleDebug).toHaveBeenCalledWith(
-      '%cnewState',
-      'font-weight:bold; color: #C6E40A',
-      data
-    )
-
-    store.getState().update((state) => {
-      state.file = rehydratedData.file
+    afterEach(() => {
+      consoleGroup.mockRestore()
+      consoleDebug.mockRestore()
     })
 
-    expect(listener).toHaveBeenCalledWith(rehydratedData.file, data.file)
+    it('works with all built-in middlewares enabled', () => {
+      const listener = jest.fn()
+      const store = createStore<StoreDataType>('jest', data, {
+        persist: { storage: createJSONStorage(() => SyncStorage) },
+        subscribe: true,
+        log: true,
+      })
+      
+      const unsubscribe = store.subscribeWithSelector?.(
+        (state: any) => state.data.file,
+        listener
+      )
 
-    unsubscribe?.()
+      expect(unsubscribe).toBeInstanceOf(Function)
+      assertStoreContent({ store, expectedData: rehydratedData })
 
-    expect.assertions(11)
-    consoleGroup.mockRestore()
-    consoleDebug.mockRestore()
-  })
+      store.getState().update((state) => {
+        state.file = data.file
+      })
 
-  it('works with customMiddlewares provided', () => {
-    const fn = jest.fn()
-    const customMiddleware: ZfyMiddlewareType<StoreDataType> =
-      (storeName, config) => (set: any, get: any, api: any) =>
-        config(
-          (args: any) => {
-            set(args)
-            fn(storeName)
-          },
-          get,
-          api
-        )
+      expect(listener).toHaveBeenCalledWith(data.file, rehydratedData.file)
+      expect(consoleGroup).toHaveBeenCalledWith(
+        '%c🗂 JEST STORE UPDATED',
+        'font-weight:bold'
+      )
+      expect(consoleDebug).toHaveBeenCalledWith(
+        '%cprevState',
+        'font-weight:bold; color: #9E9E9E',
+        rehydratedData
+      )
+      expect(consoleDebug).toHaveBeenCalledWith(
+        '%cpayload',
+        'font-weight:bold; color: #27A3F7',
+        data
+      )
+      expect(consoleDebug).toHaveBeenCalledWith(
+        '%cnewState',
+        'font-weight:bold; color: #C6E40A',
+        data
+      )
 
-    const store = createStore('jest', data, {
-      log: true,
-      persist: { storage: createJSONStorage(() => SyncStorage) },
-      customMiddlewares: [customMiddleware],
+      store.getState().update((state) => {
+        state.file = rehydratedData.file
+      })
+
+      expect(listener).toHaveBeenCalledWith(rehydratedData.file, data.file)
+
+      unsubscribe?.()
     })
 
-    assertStoreContent({ store, expectedData: rehydratedData })
-    expect(fn).toHaveBeenCalledTimes(1)
-    expect(fn).toHaveBeenCalledWith('jest')
+    it('works with custom middlewares', () => {
+      const fn = jest.fn()
+      const customMiddleware: ZfyMiddlewareType<StoreDataType> =
+        (storeName, config) => (set: any, get: any, api: any) =>
+          config(
+            (args: any) => {
+              set(args)
+              fn(storeName)
+            },
+            get,
+            api
+          )
 
-    expect.assertions(6)
+      const store = createStore('jest', data, {
+        log: true,
+        persist: { storage: createJSONStorage(() => SyncStorage) },
+        customMiddlewares: [customMiddleware],
+      })
+
+      assertStoreContent({ store, expectedData: rehydratedData })
+      expect(fn).toHaveBeenCalledTimes(1)
+      expect(fn).toHaveBeenCalledWith('jest')
+    })
   })
 })
