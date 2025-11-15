@@ -47,13 +47,13 @@
     "@babel/preset-react": "^7.18.0",
     "@babel/preset-typescript": "^7.20.0",
     "@commitlint/config-conventional": "^11.0.0",
-    "@typescript-eslint/parser": "^5.10.0",
     "@release-it/conventional-changelog": "^2.0.0",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
     "@types/jest": "^27.4.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/parser": "^5.10.0",
     "commitlint": "^11.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.2.0",
@@ -183,8 +183,9 @@
     ]
   },
   "dependencies": {
-    "zustand": "5.0.8",
-    "immer": "10.2.0"
+    "caniuse-lite": "^1.0.30001754",
+    "immer": "10.2.0",
+    "zustand": "5.0.8"
   },
   "directories": {
     "example": "example",

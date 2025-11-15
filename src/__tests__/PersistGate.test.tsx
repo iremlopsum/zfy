@@ -4,7 +4,7 @@ import { render, waitFor } from '@testing-library/react'
 
 import PersistGate from '../core/PersistGate'
 import createStore from '../core/create-store'
-import { data, sleep, SyncStorage, AsyncStorage, rehydratedData } from '.'
+import { data, SyncStorage, AsyncStorage, rehydratedData } from '.'
 
 describe('🚪 Core > PersistGate:', () => {
   it('renders loader and rehydrates with sync storage', async () => {
@@ -36,8 +36,6 @@ describe('🚪 Core > PersistGate:', () => {
       persist: { storage: createJSONStorage(() => AsyncStorage) },
     })
 
-    // FIXME: Fix act issue:
-    // Warning: An update to PersistGate inside a test was not wrapped in act(...).
     const { container } = render(
       <PersistGate stores={[store]} loader={loader}>
         <div>
@@ -48,10 +46,12 @@ describe('🚪 Core > PersistGate:', () => {
 
     expect(container).toMatchSnapshot()
     expect(loader).toHaveBeenCalled()
-    await sleep(250)
 
-    expect(store.getState().data).toEqual(rehydratedData)
-
-    expect.assertions(3)
+    await waitFor(
+      () => {
+        expect(store.getState().data).toEqual(rehydratedData)
+      },
+      { timeout: 500 }
+    )
   })
 })
