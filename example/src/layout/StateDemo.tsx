@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Code2, User, Palette, Settings } from 'lucide-react'
 
 import { CodeBlock } from './CodeBlock'
@@ -23,8 +23,23 @@ interface StateDemoProps {
   theme: 'light' | 'dark'
 }
 
+type TabValue = 'user' | 'theme' | 'preferences'
+
 export function StateDemo({ theme }: StateDemoProps) {
   const [showCode, setShowCode] = useState(false)
+
+  // Initialize selected tab from URL query params
+  const [selectedTab, setSelectedTab] = useState<TabValue>(() => {
+    const params = new URLSearchParams(window.location.search)
+    const tabParam = params.get('tab')
+
+    if (tabParam && ['user', 'theme', 'preferences'].includes(tabParam)) {
+      return tabParam as TabValue
+    }
+
+    return 'user'
+  })
+
   const user = userStore((data) => data)
   const themeState = themeStore((data) => data)
   const preferences = preferencesStore((data) => data)
@@ -32,6 +47,14 @@ export function StateDemo({ theme }: StateDemoProps) {
   const updateUser = userStore.getState().update
   const updateTheme = themeStore.getState().update
   const updatePreferences = preferencesStore.getState().update
+
+  // Update URL query params when tab changes
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    params.set('tab', selectedTab)
+    const newUrl = `${window.location.pathname}?${params.toString()}`
+    window.history.replaceState({}, '', newUrl)
+  }, [selectedTab])
 
   const incrementAge = () => {
     updateUser((data) => {
@@ -170,7 +193,11 @@ function MyComponent() {
             <CodeBlock title="Usage Example" code={usageCode} theme={theme} />
           </div>
         ) : (
-          <Tabs defaultValue="user" className="w-full">
+          <Tabs
+            value={selectedTab}
+            onValueChange={(value) => setSelectedTab(value as TabValue)}
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="user" className="gap-2">
                 <User className="w-4 h-4" />
@@ -347,7 +374,7 @@ function MyComponent() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="p-4 rounded-lg border bg-gradient-to-r from-purple-500/10 to-pink-500/10">
+                    <div className="p-4 rounded-lg border bg-linear-to-r from-purple-500/10 to-pink-500/10">
                       <div className="flex items-center justify-between">
                         <div>
                           <p
