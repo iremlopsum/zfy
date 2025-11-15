@@ -12,6 +12,13 @@ export const persistentStorage: Record<string, any> = {
   jest: JSON.stringify(storeContent('jest')),
   jestA: JSON.stringify(storeContent('jestA')),
   jestB: JSON.stringify(storeContent('jestB')),
+  jestChildrenFn: JSON.stringify(storeContent('jestChildrenFn')),
+  jestJSX: JSON.stringify(storeContent('jestJSX')),
+  jestAsyncA: JSON.stringify(storeContent('jestAsyncA')),
+  jestAsyncB: JSON.stringify(storeContent('jestAsyncB')),
+  jestMixedA: JSON.stringify(storeContent('jestMixedA')),
+  jestAsync: JSON.stringify(storeContent('jestAsync')),
+  jestRender: JSON.stringify(storeContent('jestRender')),
 }
 
 export const SyncStorage = {

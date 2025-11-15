@@ -137,10 +137,7 @@ describe('🚀 Core > initStores():', () => {
       const storeA = createStore<StoresDataType['jestA']>('jestA', dataA)
       const storeB = createStore<StoresDataType['jestB']>('jestB', dataB)
 
-      const { stores, useStores } = initStores<StoresDataType>([
-        storeA,
-        storeB,
-      ])
+      const { stores, useStores } = initStores<StoresDataType>([storeA, storeB])
 
       const { result } = renderHook(() =>
         useStores(
@@ -163,6 +160,191 @@ describe('🚀 Core > initStores():', () => {
       act(stores.reset)
 
       expect(result.current).toBe(dataA.fileA)
+    })
+  })
+
+  describe('concurrent operations', () => {
+    it('handles simultaneous updates to multiple stores', () => {
+      const storeA = createStore<StoresDataType['jestA']>('jestA', dataA)
+      const storeB = createStore<StoresDataType['jestB']>('jestB', dataB)
+
+      const { stores } = initStores<StoresDataType>([storeA, storeB])
+
+      // Perform simultaneous updates
+      act(() => {
+        stores.jestA.getState().update((data) => {
+          data.fileA = 'concurrent-A'
+        })
+        stores.jestB.getState().update((data) => {
+          data.fileB = 'concurrent-B'
+        })
+      })
+
+      expect(stores.jestA.getState().data.fileA).toBe('concurrent-A')
+      expect(stores.jestB.getState().data.fileB).toBe('concurrent-B')
+    })
+
+    it('handles concurrent rehydration calls', async () => {
+      const storeA = createStore<StoresDataType['jestA']>('jestA', dataA, {
+        persist: { storage: createJSONStorage(() => SyncStorage) },
+      })
+      const storeB = createStore<StoresDataType['jestB']>('jestB', dataB, {
+        persist: { storage: createJSONStorage(() => SyncStorage) },
+      })
+
+      const { stores } = initStores<StoresDataType>([storeA, storeB])
+
+      // Call rehydrate multiple times concurrently
+      const [result1, result2, result3] = await Promise.all([
+        stores.rehydrate(),
+        stores.rehydrate(),
+        stores.rehydrate(),
+      ])
+
+      expect(result1).toBeTruthy()
+      expect(result2).toBeTruthy()
+      expect(result3).toBeTruthy()
+      expect(stores.jestA.getState().data).toEqual(rehydratedData)
+      expect(stores.jestB.getState().data).toEqual(rehydratedData)
+    })
+
+    it('handles concurrent reset calls', () => {
+      const storeA = createStore<StoresDataType['jestA']>('jestA', dataA)
+      const storeB = createStore<StoresDataType['jestB']>('jestB', dataB)
+
+      const { stores } = initStores<StoresDataType>([storeA, storeB])
+
+      // Update stores
+      stores.jestA.getState().update((data) => {
+        data.fileA = 'modified-A'
+      })
+      stores.jestB.getState().update((data) => {
+        data.fileB = 'modified-B'
+      })
+
+      // Call reset multiple times
+      act(() => {
+        stores.reset()
+        stores.reset()
+        stores.reset()
+      })
+
+      expect(stores.jestA.getState().data).toEqual(dataA)
+      expect(stores.jestB.getState().data).toEqual(dataB)
+    })
+
+    it('handles rapid sequential updates to same store', () => {
+      const storeA = createStore<StoresDataType['jestA']>('jestA', dataA)
+      const { stores } = initStores<StoresDataType>([storeA])
+
+      // Perform rapid updates
+      act(() => {
+        for (let i = 0; i < 100; i++) {
+          stores.jestA.getState().update((data) => {
+            data.fileA = `update-${i}`
+          })
+        }
+      })
+
+      expect(stores.jestA.getState().data.fileA).toBe('update-99')
+    })
+
+    it('handles interleaved updates and resets', () => {
+      const storeA = createStore<StoresDataType['jestA']>('jestA', dataA)
+      const storeB = createStore<StoresDataType['jestB']>('jestB', dataB)
+
+      const { stores } = initStores<StoresDataType>([storeA, storeB])
+
+      act(() => {
+        stores.jestA.getState().update((data) => {
+          data.fileA = 'step-1'
+        })
+        stores.jestB.getState().update((data) => {
+          data.fileB = 'step-1'
+        })
+        stores.reset({ omit: ['jestB'] })
+        stores.jestA.getState().update((data) => {
+          data.fileA = 'step-2'
+        })
+      })
+
+      expect(stores.jestA.getState().data.fileA).toBe('step-2')
+      expect(stores.jestB.getState().data.fileB).toBe('step-1')
+    })
+
+    it('handles concurrent updates from multiple React hooks', () => {
+      const storeA = createStore<StoresDataType['jestA']>('jestA', dataA)
+      const { stores, useStores } = initStores<StoresDataType>([storeA])
+
+      const { result: result1 } = renderHook(() =>
+        useStores('jestA', (data) => data.fileA)
+      )
+      const { result: result2 } = renderHook(() =>
+        useStores('jestA', (data) => data.fileA)
+      )
+
+      expect(result1.current).toBe(dataA.fileA)
+      expect(result2.current).toBe(dataA.fileA)
+
+      act(() => {
+        stores.jestA.getState().update((data) => {
+          data.fileA = 'concurrent-hook-update'
+        })
+      })
+
+      expect(result1.current).toBe('concurrent-hook-update')
+      expect(result2.current).toBe('concurrent-hook-update')
+    })
+
+    it('maintains store consistency during rapid state changes', () => {
+      const storeA = createStore<StoresDataType['jestA']>('jestA', dataA)
+      const storeB = createStore<StoresDataType['jestB']>('jestB', dataB)
+
+      const { stores } = initStores<StoresDataType>([storeA, storeB])
+
+      // Perform many rapid operations
+      act(() => {
+        for (let i = 0; i < 50; i++) {
+          stores.jestA.getState().update((data) => {
+            data.fileA = `A-${i}`
+          })
+          stores.jestB.getState().update((data) => {
+            data.fileB = `B-${i}`
+          })
+
+          // Reset happens every 10 iterations
+          if (i % 10 === 0 && i > 0) {
+            stores.reset({ omit: ['jestB'] })
+          }
+        }
+      })
+
+      // After the loop, storeA should be at initial state from last reset at i=40
+      // Then updated at i=41-49, so it should have the last value before final reset
+      // Actually, the logic resets at i=10,20,30,40 and updates continue after
+      // Final value should be from updates after last reset
+      expect(stores.jestA.getState().data.fileA).toBe('A-49')
+      expect(stores.jestB.getState().data.fileB).toBe('B-49')
+    })
+
+    it('handles race condition between reset and update', () => {
+      const storeA = createStore<StoresDataType['jestA']>('jestA', dataA)
+      const { stores } = initStores<StoresDataType>([storeA])
+
+      // Update before reset
+      stores.jestA.getState().update((data) => {
+        data.fileA = 'before-reset'
+      })
+
+      act(() => {
+        // These happen in quick succession
+        stores.reset()
+        stores.jestA.getState().update((data) => {
+          data.fileA = 'after-reset'
+        })
+      })
+
+      expect(stores.jestA.getState().data.fileA).toBe('after-reset')
     })
   })
 })

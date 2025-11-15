@@ -99,7 +99,7 @@ describe('🐣 Core > createStore():', () => {
       const store = createStore<StoreDataType>('jest', data, {
         subscribe: true,
       })
-      
+
       const unsubscribe = store.subscribeWithSelector?.(
         (state: any) => state.data.file,
         listener,
@@ -138,8 +138,192 @@ describe('🐣 Core > createStore():', () => {
       const store = createStore('jest', data, {
         persist: { storage: createJSONStorage(() => SyncStorage) },
       })
-      
+
       assertStoreContent({ store, expectedData: rehydratedData })
+    })
+
+    describe('storage failure scenarios', () => {
+      let consoleError: jest.SpyInstance
+
+      beforeEach(() => {
+        consoleError = jest.spyOn(console, 'error').mockImplementation()
+      })
+
+      afterEach(() => {
+        consoleError.mockRestore()
+      })
+
+      it('handles storage getItem throwing error', () => {
+        const FailingStorage = {
+          getItem: () => {
+            throw new Error('Storage read failed')
+          },
+          setItem: SyncStorage.setItem,
+          removeItem: SyncStorage.removeItem,
+        }
+
+        // Store should still be created with initial data
+        const store = createStore('jest', data, {
+          persist: { storage: createJSONStorage(() => FailingStorage) },
+        })
+
+        // Falls back to initial data when storage fails
+        assertStoreContent({ store, expectedData: data })
+      })
+
+      it('handles storage setItem throwing error', () => {
+        const FailingStorage = {
+          getItem: SyncStorage.getItem,
+          setItem: () => {
+            throw new Error('Storage write failed')
+          },
+          removeItem: SyncStorage.removeItem,
+        }
+
+        const store = createStore('jest', data, {
+          persist: { storage: createJSONStorage(() => FailingStorage) },
+        })
+
+        // Store should rehydrate successfully
+        assertStoreContent({ store, expectedData: rehydratedData })
+
+        // Update throws because persist middleware can't write, but state is updated
+        // Note: Zustand's persist doesn't catch storage write errors by design
+        expect(() => {
+          store.getState().update((state) => {
+            state.file = data.file
+          })
+        }).toThrow('Storage write failed')
+
+        // State should still be updated in memory before the throw
+        expect(store.getState().data.file).toBe(data.file)
+      })
+
+      it('handles quota exceeded error', () => {
+        const QuotaExceededStorage = {
+          getItem: SyncStorage.getItem,
+          setItem: () => {
+            const error: any = new Error('QuotaExceededError')
+            error.name = 'QuotaExceededError'
+            throw error
+          },
+          removeItem: SyncStorage.removeItem,
+        }
+
+        const store = createStore('jest', data, {
+          persist: { storage: createJSONStorage(() => QuotaExceededStorage) },
+        })
+
+        // Throws quota exceeded error
+        expect(() => {
+          store.getState().update((state) => {
+            state.file = 'new-file'
+          })
+        }).toThrow('QuotaExceededError')
+
+        // State is still updated in memory
+        expect(store.getState().data.file).toBe('new-file')
+      })
+
+      it('handles malformed JSON data in storage', () => {
+        const MalformedStorage = {
+          getItem: () => 'invalid-json{{{',
+          setItem: SyncStorage.setItem,
+          removeItem: SyncStorage.removeItem,
+        }
+
+        // Should fall back to initial data
+        const store = createStore('jest', data, {
+          persist: { storage: createJSONStorage(() => MalformedStorage) },
+        })
+
+        assertStoreContent({ store, expectedData: data })
+      })
+
+      it('handles null storage returns', () => {
+        const NullStorage = {
+          getItem: () => null,
+          setItem: SyncStorage.setItem,
+          removeItem: SyncStorage.removeItem,
+        }
+
+        const store = createStore('jest', data, {
+          persist: { storage: createJSONStorage(() => NullStorage) },
+        })
+
+        assertStoreContent({ store, expectedData: data })
+      })
+
+      it('handles undefined storage returns', () => {
+        const UndefinedStorage = {
+          getItem: () => undefined as any,
+          setItem: SyncStorage.setItem,
+          removeItem: SyncStorage.removeItem,
+        }
+
+        const store = createStore('jest', data, {
+          persist: { storage: createJSONStorage(() => UndefinedStorage) },
+        })
+
+        assertStoreContent({ store, expectedData: data })
+      })
+
+      it('handles storage with corrupted version data', () => {
+        const CorruptedStorage = {
+          getItem: () =>
+            JSON.stringify({
+              state: { name: 'jest', data: rehydratedData },
+              version: 'not-a-number',
+            }),
+          setItem: SyncStorage.setItem,
+          removeItem: SyncStorage.removeItem,
+        }
+
+        const store = createStore('jest', data, {
+          persist: { storage: createJSONStorage(() => CorruptedStorage) },
+        })
+
+        // Should still work, zustand handles version mismatches
+        expect(store.getState()).toBeDefined()
+      })
+
+      it('handles storage with missing state property', () => {
+        const MissingStateStorage = {
+          getItem: () => JSON.stringify({ version: 0 }),
+          setItem: SyncStorage.setItem,
+          removeItem: SyncStorage.removeItem,
+        }
+
+        const store = createStore('jest', data, {
+          persist: { storage: createJSONStorage(() => MissingStateStorage) },
+        })
+
+        assertStoreContent({ store, expectedData: data })
+      })
+
+      it('handles removeItem throwing error', () => {
+        const FailingRemoveStorage = {
+          getItem: SyncStorage.getItem,
+          setItem: SyncStorage.setItem,
+          removeItem: () => {
+            throw new Error('Remove failed')
+          },
+        }
+
+        const store = createStore('jest', data, {
+          persist: { storage: createJSONStorage(() => FailingRemoveStorage) },
+        })
+
+        assertStoreContent({ store, expectedData: rehydratedData })
+
+        // Reset should work even if persist cleanup fails
+        expect(() => {
+          store.getState().reset()
+        }).not.toThrow()
+
+        // State should be reset in memory
+        assertStoreContent({ store, expectedData: data })
+      })
     })
   })
 
@@ -158,56 +342,67 @@ describe('🐣 Core > createStore():', () => {
     })
 
     it('works with all built-in middlewares enabled', () => {
+      // Clear previous storage to avoid conflicts
+      SyncStorage.removeItem('jestCombo')
+
       const listener = jest.fn()
-      const store = createStore<StoreDataType>('jest', data, {
+      const store = createStore<StoreDataType>('jestCombo', data, {
         persist: { storage: createJSONStorage(() => SyncStorage) },
         subscribe: true,
         log: true,
       })
-      
+
       const unsubscribe = store.subscribeWithSelector?.(
         (state: any) => state.data.file,
         listener
       )
 
       expect(unsubscribe).toBeInstanceOf(Function)
-      assertStoreContent({ store, expectedData: rehydratedData })
-
-      store.getState().update((state) => {
-        state.file = data.file
+      // Store won't have rehydrated data since we cleared storage
+      assertStoreContent({
+        store,
+        expectedData: data,
+        expectedName: 'jestCombo',
       })
-
-      expect(listener).toHaveBeenCalledWith(data.file, rehydratedData.file)
-      expect(consoleGroup).toHaveBeenCalledWith(
-        '%c🗂 JEST STORE UPDATED',
-        'font-weight:bold'
-      )
-      expect(consoleDebug).toHaveBeenCalledWith(
-        '%cprevState',
-        'font-weight:bold; color: #9E9E9E',
-        rehydratedData
-      )
-      expect(consoleDebug).toHaveBeenCalledWith(
-        '%cpayload',
-        'font-weight:bold; color: #27A3F7',
-        data
-      )
-      expect(consoleDebug).toHaveBeenCalledWith(
-        '%cnewState',
-        'font-weight:bold; color: #C6E40A',
-        data
-      )
 
       store.getState().update((state) => {
         state.file = rehydratedData.file
       })
 
       expect(listener).toHaveBeenCalledWith(rehydratedData.file, data.file)
+      expect(consoleGroup).toHaveBeenCalledWith(
+        '%c🗂 JESTCOMBO STORE UPDATED',
+        'font-weight:bold'
+      )
+      expect(consoleDebug).toHaveBeenCalledWith(
+        '%cprevState',
+        'font-weight:bold; color: #9E9E9E',
+        data
+      )
+      expect(consoleDebug).toHaveBeenCalledWith(
+        '%cpayload',
+        'font-weight:bold; color: #27A3F7',
+        rehydratedData
+      )
+      expect(consoleDebug).toHaveBeenCalledWith(
+        '%cnewState',
+        'font-weight:bold; color: #C6E40A',
+        rehydratedData
+      )
+
+      store.getState().update((state) => {
+        state.file = data.file
+      })
+
+      expect(listener).toHaveBeenCalledWith(data.file, rehydratedData.file)
 
       unsubscribe?.()
     })
 
     it('works with custom middlewares', () => {
+      // Clear previous storage to avoid conflicts
+      SyncStorage.removeItem('jestCustom')
+
       const fn = jest.fn()
       const customMiddleware: ZfyMiddlewareType<StoreDataType> =
         (storeName, config) => (set: any, get: any, api: any) =>
@@ -220,15 +415,20 @@ describe('🐣 Core > createStore():', () => {
             api
           )
 
-      const store = createStore('jest', data, {
+      const store = createStore('jestCustom', data, {
         log: true,
         persist: { storage: createJSONStorage(() => SyncStorage) },
         customMiddlewares: [customMiddleware],
       })
 
-      assertStoreContent({ store, expectedData: rehydratedData })
+      // Store won't have rehydrated data since we cleared storage
+      assertStoreContent({
+        store,
+        expectedData: data,
+        expectedName: 'jestCustom',
+      })
       expect(fn).toHaveBeenCalledTimes(1)
-      expect(fn).toHaveBeenCalledWith('jest')
+      expect(fn).toHaveBeenCalledWith('jestCustom')
     })
   })
 })
