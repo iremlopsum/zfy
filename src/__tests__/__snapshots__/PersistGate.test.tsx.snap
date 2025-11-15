@@ -1,11 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`🚪 Core > PersistGate: renders loader and rehydrates with async storage 1`] = `null`;
+exports[`🚪 Core > PersistGate: renders loader and rehydrates with async storage 1`] = `<div />`;
 
-exports[`🚪 Core > PersistGate: renders loader and rehydrates with sync storage 1`] = `
-<View>
-  <Text>
-    My App
-  </Text>
-</View>
-`;
+exports[`🚪 Core > PersistGate: renders loader and rehydrates with sync storage 1`] = `<div />`;

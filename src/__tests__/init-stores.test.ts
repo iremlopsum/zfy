@@ -1,8 +1,8 @@
-import { SyncStorage, rehydratedData } from './index'
-import { initStores, createStore } from '../core'
-import { renderHook } from '@testing-library/react-hooks'
-import { act } from 'react-test-renderer'
+import { act, renderHook } from '@testing-library/react'
 import { createJSONStorage } from 'zustand/middleware'
+
+import { initStores, createStore } from '../core'
+import { SyncStorage, rehydratedData } from './index'
 
 const dataA = { fileA: 'create-store.test.ts' }
 const rehydratedDataA = { fileA: 'rehydrated' }

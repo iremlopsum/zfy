@@ -1,5 +1,5 @@
-import { renderHook } from '@testing-library/react-hooks'
 import { createJSONStorage } from 'zustand/middleware'
+import { renderHook, waitFor } from '@testing-library/react'
 
 import createStore from '../core/create-store'
 import useRehydrate from '../core/use-rehydrate'
@@ -15,18 +15,15 @@ describe('💧 Core > useRehydrate():', () => {
       persist: { storage: createJSONStorage(() => SyncStorage) },
     })
 
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useRehydrate([store])
-    )
+    const { result } = renderHook(() => useRehydrate([store]))
 
     expect(result.current.valueOf()).toBeFalsy()
 
-    await waitForNextUpdate()
+    await waitFor(() => {
+      expect(result.current.valueOf()).toBeTruthy()
+    })
 
-    expect(result.current.valueOf()).toBeTruthy()
     expect(store.getState().data).toEqual(rehydratedData)
-
-    expect.assertions(3)
   })
 
   /**
@@ -38,17 +35,14 @@ describe('💧 Core > useRehydrate():', () => {
       persist: { storage: createJSONStorage(() => AsyncStorage) },
     })
 
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useRehydrate([store])
-    )
+    const { result } = renderHook(() => useRehydrate([store]))
 
     expect(result.current.valueOf()).toBeFalsy()
 
-    await waitForNextUpdate()
+    await waitFor(() => {
+      expect(result.current.valueOf()).toBeTruthy()
+    })
 
-    expect(result.current.valueOf()).toBeTruthy()
     expect(store.getState().data).toEqual(rehydratedData)
-
-    expect.assertions(3)
   })
 })

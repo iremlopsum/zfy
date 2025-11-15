@@ -1,11 +1,10 @@
 import React from 'react'
-import { Text, View } from 'react-native'
-import { render, waitFor } from '@testing-library/react-native'
 import { createJSONStorage } from 'zustand/middleware'
+import { render, waitFor } from '@testing-library/react'
 
-import { data, sleep, SyncStorage, AsyncStorage, rehydratedData } from '.'
 import PersistGate from '../core/PersistGate'
 import createStore from '../core/create-store'
+import { data, sleep, SyncStorage, AsyncStorage, rehydratedData } from '.'
 
 describe('🚪 Core > PersistGate:', () => {
   it('renders loader and rehydrates with sync storage', async () => {
@@ -14,17 +13,17 @@ describe('🚪 Core > PersistGate:', () => {
       persist: { storage: createJSONStorage(() => SyncStorage) },
     })
 
-    const { toJSON } = await waitFor(() =>
+    const { container } = await waitFor(() =>
       render(
         <PersistGate stores={[store]} loader={loader}>
-          <View>
-            <Text>My App</Text>
-          </View>
+          <div>
+            <span>My App</span>
+          </div>
         </PersistGate>
       )
     )
 
-    expect(toJSON()).toMatchSnapshot()
+    expect(container).toMatchSnapshot()
     expect(loader).toHaveBeenCalled()
     expect(store.getState().data).toEqual(rehydratedData)
 
@@ -39,15 +38,15 @@ describe('🚪 Core > PersistGate:', () => {
 
     // FIXME: Fix act issue:
     // Warning: An update to PersistGate inside a test was not wrapped in act(...).
-    const { toJSON } = render(
+    const { container } = render(
       <PersistGate stores={[store]} loader={loader}>
-        <View>
-          <Text>My App</Text>
-        </View>
+        <div>
+          <span>My App</span>
+        </div>
       </PersistGate>
     )
 
-    expect(toJSON()).toMatchSnapshot()
+    expect(container).toMatchSnapshot()
     expect(loader).toHaveBeenCalled()
     await sleep(250)
 
