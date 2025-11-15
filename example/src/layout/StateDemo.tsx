@@ -77,38 +77,62 @@ export function StateDemo({ theme }: StateDemoProps) {
     preferencesStore().reset()
   }
 
-  const storeCode = `import { createStore } from 'zfy';
+  const storeCode = `import { createStore } from '@colorfy-software/zfy';
+import { createJSONStorage } from 'zustand/middleware';
 
 // User Store
-const useUserStore = createStore({
+interface UserState {
+  name: string;
+  age: number;
+}
+
+const userStore = createStore<UserState>('user', {
   name: 'Alice',
   age: 25
 });
 
 // Theme Store
-const useThemeStore = createStore({
+interface ThemeState {
+  theme: 'light' | 'dark';
+}
+
+const themeStore = createStore<ThemeState>('theme', {
   theme: 'dark'
 });
 
 // Preferences Store with persistence
-const usePreferencesStore = createStore({
-  visitCount: 1,
-  notificationsEnabled: true,
-  autoSave: true
-}, {
-  persist: true,  // 💾 Survives page reloads!
-  logger: true    // 📝 Logs all updates
-});`
+interface PreferencesState {
+  visitCount: number;
+  notificationsEnabled: boolean;
+  autoSave: boolean;
+}
+
+const preferencesStore = createStore<PreferencesState>(
+  'preferences',
+  {
+    visitCount: 0,
+    autoSave: true,
+    notificationsEnabled: true
+  },
+  {
+    persist: {
+      name: 'zfy-preferences',
+      storage: createJSONStorage(() => localStorage)
+    }
+  }
+);`
 
   const usageCode = `// Using multiple stores in components
 function MyComponent() {
-  const user = useUserStore();
-  const { theme } = useThemeStore();
-  const preferences = usePreferencesStore();
+  const user = userStore((data) => data);
+  const theme = themeStore((data) => data.theme);
+  const preferences = preferencesStore((data) => data);
+  
+  const updateUser = userStore.getState().update;
   
   const incrementAge = () => {
-    useUserStore.set((state) => {
-      state.age += 1;  // ✨ Immer-powered updates
+    updateUser((data) => {
+      data.age += 1;  // ✨ Immer-powered updates
     });
   };
   

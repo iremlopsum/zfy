@@ -1,64 +1,129 @@
 # Zfy Example
 
-A simple example demonstrating how to use Zfy for state management with React.
+A comprehensive interactive demo showcasing Zfy state management with React. This example features three different stores, persistence, theme switching, and a modern UI to demonstrate Zfy's capabilities.
 
 ## Getting Started
 
 Install dependencies:
 
 ```bash
-npm install
+yarn install
 ```
 
 Run the development server:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 Build for production:
 
 ```bash
-npm run build
+yarn build
 ```
 
 Preview production build:
 
 ```bash
-npm run preview
+yarn preview
 ```
 
-## Example Usage
+## What's Included
 
-This example demonstrates the clean Zfy API:
+This example demonstrates three different stores with various features:
+
+### 1. User Store
+
+- Basic state management with name and age
+- Immer-powered updates (mutate state directly)
+- Reset functionality
 
 ```typescript
-import { createStore } from '@colorfy-software/zfy'
-
-// Create a store
-const userStore = createStore('user', {
-  likes: 0,
+const userStore = createStore<UserState>('user', {
+  name: 'Alice',
+  age: 25,
 })
 
-// Use in a component with clean selector API
-function App() {
-  // Selector receives data directly - no need for data.data.likes
-  const likes = userStore((data) => data.likes)
-  
-  const updateLikes = userStore.getState().update
-  
-  return (
-    <div>
-      <h1>Likes: {likes}</h1>
-      <button onClick={() => updateLikes((data) => data.likes += 1)}>
-        Increment
-      </button>
-    </div>
-  )
-}
+// Usage in components
+const user = userStore((data) => data)
+const updateUser = userStore.getState().update
+
+updateUser((data) => {
+  data.age += 1 // ✨ Mutate directly with Immer
+})
 ```
 
-See the full example in `src/App.tsx`.
+### 2. Theme Store
+
+- Light/dark mode switching
+- System preference detection
+- Global state shared across all components
+
+```typescript
+const themeStore = createStore<ThemeState>('theme', {
+  theme: getInitialTheme(),
+})
+
+// Theme updates reflect instantly across the entire app
+const theme = themeStore((data) => data.theme)
+```
+
+### 3. Preferences Store (with Persistence)
+
+- Visit count tracking
+- User preferences (notifications, auto-save)
+- **localStorage persistence** - state survives page refreshes
+
+```typescript
+const preferencesStore = createStore<PreferencesState>(
+  'preferences',
+  {
+    visitCount: 0,
+    autoSave: true,
+    notificationsEnabled: true,
+  },
+  {
+    persist: {
+      name: 'zfy-preferences',
+      storage: createJSONStorage(() => localStorage),
+    },
+  }
+)
+```
+
+## Features Demonstrated
+
+- ✅ **Multiple Stores** - Three independent stores working together
+- ✅ **Immer Integration** - Mutate state directly with clean syntax
+- ✅ **Persistence** - localStorage integration with Zustand middleware
+- ✅ **TypeScript** - Full type safety throughout
+- ✅ **Selectors** - Efficient component re-renders with granular selectors
+- ✅ **Reset Functionality** - Reset stores to initial state
+- ✅ **Interactive UI** - Tabbed interface showing real-time state updates
+
+## Project Structure
+
+```
+src/
+├── App.tsx                    # Main app component
+├── stores/
+│   ├── user-store.ts          # User state management
+│   ├── theme-store.ts         # Theme state with system detection
+│   └── preferences-store.ts   # Persisted preferences
+├── layout/
+│   ├── Hero.tsx               # Landing hero section
+│   ├── Features.tsx           # Feature highlights
+│   ├── StateDemo.tsx          # Interactive demo with three stores
+│   ├── CodeBlock.tsx          # Syntax-highlighted code display
+│   └── Footer.tsx             # Footer with links
+└── components/
+    ├── button.tsx             # Button component
+    ├── card.tsx               # Card component
+    ├── input.tsx              # Input component
+    ├── label.tsx              # Label component
+    ├── switch.tsx             # Switch component
+    └── tabs.tsx               # Tabs component
+```
 
 ## Tech Stack
 
@@ -66,4 +131,15 @@ See the full example in `src/App.tsx`.
 - **React 19** - UI library
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Utility-first CSS framework
-- **Zfy** - State management with Zustand
+- **shadcn/ui** - Beautiful, accessible UI components
+- **Zfy** - State management powered by Zustand
+- **Lucide React** - Icon library
+
+## Try It Out
+
+1. Run the dev server and open the app
+2. Navigate through the three tabs (User, Theme, Preferences)
+3. Make changes to the state
+4. Toggle the theme to see instant updates
+5. Refresh the page to see preferences persist!
+6. Click the code button to see the implementation
