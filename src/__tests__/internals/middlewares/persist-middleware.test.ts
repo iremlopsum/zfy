@@ -1,7 +1,9 @@
 import { createJSONStorage } from 'zustand/middleware'
-import persistMiddleware from '../../../internals/middlewares/persist-middleware'
-import type { CreateStoreOptionsType } from '../../../types'
+
 import { SyncStorage } from '../../index'
+import persistMiddleware from '../../../internals/middlewares/persist-middleware'
+
+import type { CreateStoreOptionsType } from '../../../types'
 
 // Mock zustand's persist middleware
 jest.mock('zustand/middleware', () => ({

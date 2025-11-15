@@ -1,10 +1,9 @@
 import React, { useEffect, memo } from 'react'
 
-import type { CreateStoreType } from '../types'
-
 import useRehydrate from './use-rehydrate'
 import { validatePersistGate } from '../internals/validations'
 
+import type { CreateStoreType } from '../types'
 interface PropsType<StoresType> {
   children: JSX.Element | JSX.Element[] | (() => JSX.Element)
   loader?: JSX.Element | (() => JSX.Element)

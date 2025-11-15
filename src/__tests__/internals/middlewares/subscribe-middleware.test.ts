@@ -1,4 +1,5 @@
 import subscribeMiddleware from '../../../internals/middlewares/subscribe-middleware'
+
 import type { CreateStoreOptionsType, StoreType } from '../../../types'
 
 describe('🔔 Internals > Middlewares > subscribe:', () => {

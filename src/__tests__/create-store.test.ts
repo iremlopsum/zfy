@@ -1,8 +1,8 @@
 import type { ZfyMiddlewareType } from '../types'
 import { createJSONStorage } from 'zustand/middleware'
 
-import { data, SyncStorage, rehydratedData, assertStoreContent } from '.'
 import createStore from '../core/create-store'
+import { data, SyncStorage, rehydratedData, assertStoreContent } from '.'
 
 type StoreDataType = typeof data
 

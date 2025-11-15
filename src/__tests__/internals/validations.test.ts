@@ -1,16 +1,17 @@
-import { createJSONStorage } from 'zustand/middleware'
 import { create } from 'zustand'
+import { createJSONStorage } from 'zustand/middleware'
 
+import { SyncStorage } from '../index'
+import { InvariantError } from '../../internals/invariant'
 import {
   validateInitStores,
   validatePersistGate,
-  validateUseRehydrate,
   validateCreateStore,
+  validateUseRehydrate,
   validateOptionsForPersistence,
 } from '../../internals/validations'
-import { InvariantError } from '../../internals/invariant'
+
 import type { CreateStoreType, CreateStoreOptionsType } from '../../types'
-import { SyncStorage } from '../index'
 
 // Helper to create a minimal store for testing
 const createMockStore = (name: string): CreateStoreType<any> => {

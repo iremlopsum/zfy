@@ -1,11 +1,11 @@
+import invariant from '../internals/invariant'
+import { validateInitStores } from '../internals/validations'
+
 import type {
   InitStoresType,
   CreateStoreType,
   InitStoresResetOptionsType,
 } from '../types'
-
-import invariant from '../internals/invariant'
-import { validateInitStores } from '../internals/validations'
 
 /**
  * Hooks that let you consume data from any of the stores provided to `initStores()`.
@@ -53,8 +53,10 @@ export default function <
 
     invariant(
       store !== undefined,
-      `'${storeName}' is not a valid store name. Did you mean any of these: ${storesNames.map(
-        (validName) => `\n• ${validName}`
+      `'${String(
+        storeName
+      )}' is not a valid store name. Did you mean any of these: ${storesNames.map(
+        (validName) => `\n• ${String(validName)}`
       )}`
     )
 

@@ -1,6 +1,8 @@
 import { createJSONStorage } from 'zustand/middleware'
-import type { CreateStoreType } from '../../types'
+
 import { SyncStorage, AsyncStorage } from '../index'
+
+import type { CreateStoreType } from '../../types'
 
 /**
  * Test Helpers

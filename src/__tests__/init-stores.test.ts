@@ -1,5 +1,5 @@
-import { act, renderHook } from '@testing-library/react'
 import { createJSONStorage } from 'zustand/middleware'
+import { act, renderHook } from '@testing-library/react'
 
 import { initStores, createStore } from '../core'
 import { SyncStorage, rehydratedData } from './index'

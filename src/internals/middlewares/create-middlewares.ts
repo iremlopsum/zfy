@@ -1,14 +1,14 @@
-import type {
-  ZfyMiddlewareType,
-  CreateStoreConfigType,
-  CreateStoreOptionsType,
-} from '../../types'
-
 import logger from './logger-middleware'
 import persist from './persist-middleware'
 import subscribe from './subscribe-middleware'
 
 import { validateOptionsForPersistence } from '../validations'
+
+import type {
+  ZfyMiddlewareType,
+  CreateStoreConfigType,
+  CreateStoreOptionsType,
+} from '../../types'
 
 const createMiddleware = <StoreDataType>(
   storeName: string,

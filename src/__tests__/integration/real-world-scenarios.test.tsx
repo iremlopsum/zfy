@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { render, waitFor, fireEvent, act } from '@testing-library/react'
 import { createJSONStorage } from 'zustand/middleware'
-import { createStore, initStores, PersistGate } from '../../core'
+import { render, waitFor, fireEvent, act } from '@testing-library/react'
+
 import { SyncStorage, AsyncStorage } from '../index'
+import { createStore, initStores, PersistGate } from '../../core'
 
 /**
  * Integration Tests: Real-World Scenarios
@@ -175,17 +176,15 @@ describe('🌍 Integration > Real-World Scenarios:', () => {
         }
 
         // Fetch new data
-        act(() => {
+        await act(async () => {
           stores.cache.getState().update((state) => {
             state.loading[key] = true
           })
-        })
 
-        await new Promise((resolve) => setTimeout(resolve, 10))
+          await new Promise((resolve) => setTimeout(resolve, 10))
 
-        const newData = { id: key, value: 'fetched' }
+          const newData = { id: key, value: 'fetched' }
 
-        act(() => {
           stores.cache.getState().update((state) => {
             state.data[key] = newData
             state.timestamps[key] = now
@@ -193,7 +192,7 @@ describe('🌍 Integration > Real-World Scenarios:', () => {
           })
         })
 
-        return newData
+        return stores.cache.getState().data.data[key]
       }
 
       // First fetch
@@ -268,19 +267,15 @@ describe('🌍 Integration > Real-World Scenarios:', () => {
 
       const TestComponent = ({ id }: { id: string }) => {
         useEffect(() => {
-          act(() => {
-            stores.lifecycle.getState().update((state) => {
-              state.mounted++
-              state.active.push(id)
-            })
+          stores.lifecycle.getState().update((state) => {
+            state.mounted++
+            state.active.push(id)
           })
 
           return () => {
-            act(() => {
-              stores.lifecycle.getState().update((state) => {
-                state.unmounted++
-                state.active = state.active.filter((item) => item !== id)
-              })
+            stores.lifecycle.getState().update((state) => {
+              state.unmounted++
+              state.active = state.active.filter((item) => item !== id)
             })
           }
         }, [id])
@@ -326,19 +321,15 @@ describe('🌍 Integration > Real-World Scenarios:', () => {
         useEffect(() => {
           let mounted = true
 
-          act(() => {
-            stores.async.getState().update((state) => {
-              state.loading = true
-            })
+          stores.async.getState().update((state) => {
+            state.loading = true
           })
 
           setTimeout(() => {
             if (mounted) {
-              act(() => {
-                stores.async.getState().update((state) => {
-                  state.data = { value: 'loaded' }
-                  state.loading = false
-                })
+              stores.async.getState().update((state) => {
+                state.data = { value: 'loaded' }
+                state.loading = false
               })
               setLocalData({ value: 'loaded' } as any)
             }
@@ -586,4 +577,3 @@ describe('🌍 Integration > Real-World Scenarios:', () => {
     })
   })
 })
-

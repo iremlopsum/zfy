@@ -1,7 +1,8 @@
-import createStore from '../../core/create-store'
-import { initStores } from '../../core'
 import { createJSONStorage } from 'zustand/middleware'
+
 import { SyncStorage } from '../index'
+import { initStores } from '../../core'
+import createStore from '../../core/create-store'
 import { measureExecutionTime } from '../utils/test-helpers'
 
 /**
@@ -136,16 +137,20 @@ describe('🔬 Advanced > Memory & Performance:', () => {
       // This tests overall efficiency without flaky timing comparisons
       expect(totalTime).toBeLessThan(100)
       expect(store.getState().data.items).toHaveLength(1000)
-      
+
       // Verify items are correct
       expect(store.getState().data.items[0]).toBe(0)
       expect(store.getState().data.items[999]).toBe(999)
     })
 
     it('maintains subscription performance with many listeners', async () => {
-      const store = createStore('manyListeners', { value: 0 }, {
-        subscribe: true,
-      })
+      const store = createStore(
+        'manyListeners',
+        { value: 0 },
+        {
+          subscribe: true,
+        }
+      )
 
       // Add many listeners
       const listeners: Array<() => void> = []
@@ -418,4 +423,3 @@ describe('🔬 Advanced > Memory & Performance:', () => {
     })
   })
 })
-

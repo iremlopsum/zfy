@@ -1,12 +1,12 @@
-import createStore from '../../core/create-store'
 import { initStores } from '../../core'
-import { createJSONStorage } from 'zustand/middleware'
 import { SyncStorage, data } from '../index'
+import createStore from '../../core/create-store'
+import { createJSONStorage } from 'zustand/middleware'
 import {
-  measureExecutionTime,
-  runMultipleTimes,
-  calculateStats,
   bulkUpdate,
+  calculateStats,
+  runMultipleTimes,
+  measureExecutionTime,
 } from '../utils/test-helpers'
 
 describe('⚡ Performance > Store Operations:', () => {

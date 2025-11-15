@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 
-import type { CreateStoreType } from '../types'
-
 import { validateUseRehydrate } from '../internals/validations'
+
+import type { CreateStoreType } from '../types'
 
 /**
  * Hooks that rehydrates persisted stores on app launch.

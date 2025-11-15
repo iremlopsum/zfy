@@ -1,5 +1,8 @@
-import { create } from 'zustand'
 import { produce } from 'immer'
+import { create } from 'zustand'
+
+import { validateCreateStore } from '../internals/validations'
+import createMiddlewares from '../internals/middlewares/create-middlewares'
 
 import type {
   StoreType,
@@ -7,9 +10,6 @@ import type {
   CreateStoreConfigType,
   CreateStoreOptionsType,
 } from '../types'
-
-import { validateCreateStore } from '../internals/validations'
-import createMiddlewares from '../internals/middlewares/create-middlewares'
 
 /**
  * Function that creates and returns a zustand store.

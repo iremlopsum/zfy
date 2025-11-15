@@ -1,7 +1,9 @@
 import { createJSONStorage } from 'zustand/middleware'
-import createMiddlewares from '../../../internals/middlewares/create-middlewares'
-import type { ZfyMiddlewareType, CreateStoreOptionsType } from '../../../types'
+
 import { SyncStorage } from '../../index'
+import createMiddlewares from '../../../internals/middlewares/create-middlewares'
+
+import type { ZfyMiddlewareType, CreateStoreOptionsType } from '../../../types'
 
 // Mock the individual middleware modules
 jest.mock('../../../internals/middlewares/logger-middleware', () => ({

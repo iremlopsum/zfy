@@ -1,6 +1,6 @@
-import type { CreateStoreType, CreateStoreOptionsType } from '../types'
-
 import invariant from './invariant'
+
+import type { CreateStoreType, CreateStoreOptionsType } from '../types'
 
 export function validateInitStores(stores: CreateStoreType<any>[]) {
   invariant(

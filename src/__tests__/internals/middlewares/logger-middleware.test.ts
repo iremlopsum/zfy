@@ -1,4 +1,5 @@
 import loggerMiddleware from '../../../internals/middlewares/logger-middleware'
+
 import type { CreateStoreOptionsType } from '../../../types'
 
 describe('📝 Internals > Middlewares > logger:', () => {
