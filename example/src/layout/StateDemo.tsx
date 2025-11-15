@@ -25,82 +25,52 @@ interface StateDemoProps {
 
 type TabValue = 'user' | 'theme' | 'preferences'
 
-export function StateDemo({ theme }: StateDemoProps) {
-  const [showCode, setShowCode] = useState(false)
-
-  // Initialize selected tab from URL query params
-  const [selectedTab, setSelectedTab] = useState<TabValue>(() => {
-    const params = new URLSearchParams(window.location.search)
-    const tabParam = params.get('tab')
-
-    if (tabParam && ['user', 'theme', 'preferences'].includes(tabParam)) {
-      return tabParam as TabValue
-    }
-
-    return 'user'
+// Handler functions outside component - no recreation, no useCallback needed
+const incrementAge = () => {
+  userStore.getState().update((data) => {
+    data.age += 1
   })
+}
 
-  const user = userStore((data) => data)
-  const themeState = themeStore((data) => data)
-  const preferences = preferencesStore((data) => data)
+const decrementAge = () => {
+  userStore.getState().update((data) => {
+    data.age = Math.max(0, data.age - 1)
+  })
+}
 
-  const updateUser = userStore.getState().update
-  const updateTheme = themeStore.getState().update
-  const updatePreferences = preferencesStore.getState().update
+const toggleTheme = () => {
+  themeStore.getState().update((data) => {
+    data.theme = data.theme === 'light' ? 'dark' : 'light'
+  })
+}
 
-  // Update URL query params when tab changes
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    params.set('tab', selectedTab)
-    const newUrl = `${window.location.pathname}?${params.toString()}`
-    window.history.replaceState({}, '', newUrl)
-  }, [selectedTab])
+const updateName = (name: string) => {
+  userStore.getState().update((data) => {
+    data.name = name
+  })
+}
 
-  const incrementAge = () => {
-    updateUser((data) => {
-      data.age += 1
-    })
-  }
+const toggleNotifications = () => {
+  preferencesStore.getState().update((data) => {
+    data.notificationsEnabled = !data.notificationsEnabled
+  })
+}
 
-  const decrementAge = () => {
-    updateUser((data) => {
-      data.age = Math.max(0, data.age - 1)
-    })
-  }
+const toggleAutoSave = () => {
+  preferencesStore.getState().update((data) => {
+    data.autoSave = !data.autoSave
+  })
+}
 
-  const toggleTheme = () => {
-    updateTheme((data) => {
-      data.theme = data.theme === 'light' ? 'dark' : 'light'
-    })
-  }
+const resetUser = () => {
+  userStore.getState().reset()
+}
 
-  const updateName = (name: string) => {
-    updateUser((data) => {
-      data.name = name
-    })
-  }
+const resetPreferences = () => {
+  preferencesStore.getState().reset()
+}
 
-  const toggleNotifications = () => {
-    updatePreferences((data) => {
-      data.notificationsEnabled = !data.notificationsEnabled
-    })
-  }
-
-  const toggleAutoSave = () => {
-    updatePreferences((data) => {
-      data.autoSave = !data.autoSave
-    })
-  }
-
-  const resetUser = () => {
-    userStore.getState().reset()
-  }
-
-  const resetPreferences = () => {
-    preferencesStore.getState().reset()
-  }
-
-  const storeCode = `import { createStore } from '@colorfy-software/zfy';
+const storeCode = `import { createStore } from '@colorfy-software/zfy';
 import { createJSONStorage } from 'zustand/middleware';
 
 // User Store
@@ -145,7 +115,7 @@ const preferencesStore = createStore<PreferencesState>(
   }
 );`
 
-  const usageCode = `// Using multiple stores in components
+const usageCode = `// Using multiple stores in components
 function MyComponent() {
   const user = userStore((data) => data);
   const theme = themeStore((data) => data.theme);
@@ -166,6 +136,33 @@ function MyComponent() {
     </div>
   );
 }`
+
+export function StateDemo({ theme }: StateDemoProps) {
+  const [showCode, setShowCode] = useState(false)
+
+  // Initialize selected tab from URL query params
+  const [selectedTab, setSelectedTab] = useState<TabValue>(() => {
+    const params = new URLSearchParams(window.location.search)
+    const tabParam = params.get('tab')
+
+    if (tabParam && ['user', 'theme', 'preferences'].includes(tabParam)) {
+      return tabParam as TabValue
+    }
+
+    return 'user'
+  })
+
+  const user = userStore((data) => data)
+  const themeState = themeStore((data) => data)
+  const preferences = preferencesStore((data) => data)
+
+  // Update URL query params when tab changes
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    params.set('tab', selectedTab)
+    const newUrl = `${window.location.pathname}?${params.toString()}`
+    window.history.replaceState({}, '', newUrl)
+  }, [selectedTab])
 
   return (
     <div className="mb-20">
