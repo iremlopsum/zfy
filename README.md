@@ -40,6 +40,7 @@ The doc is accessible at https://colorfy-software.gitbook.io/zfy.
 
 - The best way to learn is to follow the [guides](https://colorfy-software.gitbook.io/zfy/guides/creating-and-using-a-store). They will help you to get up and running in no time.
 - The [API reference](https://colorfy-software.gitbook.io/zfy/api/types) lists all public APIs.
+- Quick reference: See [API_REFERENCE.md](./API_REFERENCE.md) for code examples and usage patterns.
 
 ## 🤝 Contributing
 

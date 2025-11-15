@@ -1,6 +1,5 @@
-import type { StoreApi, StateCreator, StoreMutatorIdentifier } from 'zustand'
-import type { UseBoundStore } from 'zustand/react'
 import type { PersistOptions } from 'zustand/middleware'
+import type { StateCreator, StoreMutatorIdentifier } from 'zustand'
 
 // Custom types for compatibility
 export type EqualityChecker<T> = (a: T, b: T) => boolean
@@ -12,9 +11,25 @@ export interface StoreType<StoreDataType> {
   update: (producer: (data: StoreDataType) => void) => void
 }
 
-export type CreateStoreType<StoreDataType> = UseBoundStore<
-  StoreApi<StoreType<StoreDataType>>
-> & {
+export type CreateStoreType<StoreDataType> = {
+  (): StoreType<StoreDataType>
+  <U>(selector: (data: StoreDataType) => U, equalityFn?: EqualityChecker<U>): U
+  getState: () => StoreType<StoreDataType>
+  setState: (
+    partial:
+      | StoreType<StoreDataType>
+      | Partial<StoreType<StoreDataType>>
+      | ((
+          state: StoreType<StoreDataType>
+        ) => StoreType<StoreDataType> | Partial<StoreType<StoreDataType>>),
+    replace?: boolean | undefined
+  ) => void
+  subscribe: (
+    listener: (
+      state: StoreType<StoreDataType>,
+      prevState: StoreType<StoreDataType>
+    ) => void
+  ) => () => void
   persist?: {
     setOptions: (
       options: Partial<PersistOptions<StoreType<StoreDataType>>>

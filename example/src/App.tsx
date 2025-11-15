@@ -3,7 +3,7 @@ import userStore from './stores/user-store'
 const updateLikes = userStore.getState().update
 
 const App = () => {
-  const likes = userStore((data) => data.data.likes)
+  const likes = userStore((data) => data.likes)
 
   return (
     <div className="min-h-screen bg-gray-50">

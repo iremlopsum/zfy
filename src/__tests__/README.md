@@ -227,6 +227,10 @@ yarn test internals
 const store = createStore('test', { value: 1 })
 expect(store.getState().data.value).toBe(1)
 expectStoreToHaveMethods(store)
+
+// Or using the store hook selector (cleaner API):
+const value = store((data) => data.value)
+expect(value).toBe(1)
 ```
 
 ### Testing Persistence

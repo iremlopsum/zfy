@@ -33,7 +33,7 @@ export default function <StoreDataType>(
     s: CreateStoreConfigType<StoreDataType>
   ) => CreateStoreConfigType<StoreDataType>
 
-  return create<StoreType<StoreDataType>>(
+  const zustandStore = create<StoreType<StoreDataType>>(
     applyMiddlewares(storeName, (set: any) => ({
       data,
       name: storeName,
@@ -46,4 +46,40 @@ export default function <StoreDataType>(
       reset: (): void => set({ data }),
     }))
   )
+
+  // Create a wrapper hook that transforms the selector to receive data directly
+  const wrappedHook = ((selector?: any, equalityFn?: any) => {
+    if (selector === undefined) {
+      return zustandStore()
+    }
+    // Transform the selector to access the data property
+    if (equalityFn !== undefined) {
+      return (zustandStore as any)(
+        (state: StoreType<StoreDataType>) => selector(state.data),
+        equalityFn
+      )
+    }
+    return (zustandStore as any)((state: StoreType<StoreDataType>) =>
+      selector(state.data)
+    )
+  }) as CreateStoreType<StoreDataType>
+
+  // Copy over all the Zustand store methods and properties
+  wrappedHook.getState = zustandStore.getState
+  wrappedHook.setState = zustandStore.setState as any
+  wrappedHook.subscribe = zustandStore.subscribe
+
+  // Copy persist methods if they exist
+  if ((zustandStore as any).persist) {
+    wrappedHook.persist = (zustandStore as any).persist
+  }
+
+  // Copy subscribeWithSelector methods if they exist
+  if ((zustandStore as any).subscribeWithSelector) {
+    wrappedHook.subscribeWithSelector = (
+      zustandStore as any
+    ).subscribeWithSelector
+  }
+
+  return wrappedHook
 }

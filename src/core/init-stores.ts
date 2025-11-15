@@ -60,8 +60,9 @@ export default function <
       )}`
     )
 
+    // The store wrapper now handles the data extraction automatically
     // @ts-expect-error FIXME: Fix arbitrary instantiation type issue
-    return store?.(({ data }) => selector(data), equalityFn)
+    return store?.(selector, equalityFn)
   }
 
   let output: InitStoresType<StoresDataType> = {
