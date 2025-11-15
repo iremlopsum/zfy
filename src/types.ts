@@ -1,19 +1,11 @@
-import type {
-  State,
-  GetState,
-  SetState,
-  StoreApi,
-  StateCreator,
-  UseBoundStore,
-  EqualityChecker,
-} from 'zustand'
-import type {
-  PersistOptions,
-  StoreApiWithPersist,
-  StoreApiWithSubscribeWithSelector,
-} from 'zustand/middleware'
+import type { StoreApi, StateCreator, StoreMutatorIdentifier } from 'zustand'
+import type { UseBoundStore } from 'zustand/react'
+import type { PersistOptions } from 'zustand/middleware'
 
-export interface StoreType<StoreDataType> extends State {
+// Custom types for compatibility
+export type EqualityChecker<T> = (a: T, b: T) => boolean
+
+export interface StoreType<StoreDataType> {
   name: string
   data: StoreDataType
   reset: () => void
@@ -21,52 +13,59 @@ export interface StoreType<StoreDataType> extends State {
 }
 
 export type CreateStoreType<StoreDataType> = UseBoundStore<
-  StoreType<StoreDataType>
+  StoreApi<StoreType<StoreDataType>>
 > & {
-  persist?: StoreApiWithPersist<StoreType<StoreDataType>>['persist']
-  subscribeWithSelector?: StoreApiWithSubscribeWithSelector<
-    StoreType<StoreDataType>
-  >['subscribe']
+  persist?: {
+    setOptions: (
+      options: Partial<PersistOptions<StoreType<StoreDataType>>>
+    ) => void
+    clearStorage: () => void
+    rehydrate: () => Promise<void> | void
+    hasHydrated: () => boolean
+    onHydrate: (fn: (state: StoreType<StoreDataType>) => void) => () => void
+    onFinishHydration: (
+      fn: (state: StoreType<StoreDataType>) => void
+    ) => () => void
+  }
+  subscribeWithSelector?: {
+    (
+      listener: (
+        selectedState: StoreType<StoreDataType>,
+        previousSelectedState: StoreType<StoreDataType>
+      ) => void
+    ): () => void
+    <U>(
+      selector: (state: StoreType<StoreDataType>) => U,
+      listener: (selectedState: U, previousSelectedState: U) => void,
+      options?: {
+        equalityFn?: (a: U, b: U) => boolean
+        fireImmediately?: boolean
+      }
+    ): () => void
+  }
 }
 
 export type CreateStoreConfigType<
   StoreDataType,
-  StoreApiType extends StoreApi<StoreType<StoreDataType>> = StoreApi<
-    StoreType<StoreDataType>
-  >
-> = StateCreator<
-  StoreType<StoreDataType>,
-  SetState<StoreType<StoreDataType>>,
-  GetState<StoreType<StoreDataType>>,
-  StoreApiType
->
+  Mis extends [StoreMutatorIdentifier, unknown][] = [],
+  Mos extends [StoreMutatorIdentifier, unknown][] = []
+> = StateCreator<StoreType<StoreDataType>, Mis, Mos>
 
 export interface CreateStoreOptionsType<StoreDataType> {
   log?: boolean
   subscribe?: boolean
-  persist?: Omit<
-    PersistOptions<StoreType<StoreDataType>>,
-    'name' | 'blacklist' | 'whitelist'
-  > & {
+  persist?: Omit<PersistOptions<StoreType<StoreDataType>>, 'name'> & {
     name?: string
-    getStorage: Exclude<
-      PersistOptions<StoreType<StoreDataType>>['getStorage'],
-      undefined
-    >
+    storage: PersistOptions<StoreType<StoreDataType>>['storage']
   }
   customMiddlewares?: ZfyMiddlewareType<StoreDataType>[]
 }
 
-export type ZfyMiddlewareType<
-  StoreDataType,
-  StoreApiType extends StoreApi<StoreType<StoreDataType>> = StoreApi<
-    StoreType<StoreDataType>
-  >
-> = (
+export type ZfyMiddlewareType<StoreDataType> = (
   storeName: string,
   config: CreateStoreConfigType<StoreDataType>,
   options?: CreateStoreOptionsType<StoreDataType>
-) => CreateStoreConfigType<StoreDataType, StoreApiType>
+) => CreateStoreConfigType<StoreDataType>
 
 export type InitStoresResetOptionsType<StoreDataType> = {
   omit?: Array<keyof StoreDataType>

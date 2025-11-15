@@ -1,5 +1,5 @@
-import create from 'zustand'
-import produce from 'immer'
+import { create } from 'zustand'
+import { produce } from 'immer'
 
 import type {
   StoreType,
@@ -34,10 +34,10 @@ export default function <StoreDataType>(
   ) => CreateStoreConfigType<StoreDataType>
 
   return create<StoreType<StoreDataType>>(
-    applyMiddlewares(storeName, (set) => ({
+    applyMiddlewares(storeName, (set: any) => ({
       data,
       name: storeName,
-      update: (producer): void =>
+      update: (producer: (data: StoreDataType) => void): void =>
         set(
           produce((currentStore: StoreType<StoreDataType>) => {
             producer(currentStore.data)

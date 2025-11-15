@@ -10,9 +10,9 @@ const middleware =
     config: CreateStoreConfigType<StoreDataType>,
     options?: CreateStoreOptionsType<StoreDataType>
   ): CreateStoreConfigType<StoreDataType> =>
-  (set, get, api): StoreType<StoreDataType> =>
+  (set: any, get: any, api: any): StoreType<StoreDataType> =>
     config(
-      (args) => {
+      (args: any) => {
         const prevState = get().data
         const payload = typeof args === 'function' ? args(get()) : args
 

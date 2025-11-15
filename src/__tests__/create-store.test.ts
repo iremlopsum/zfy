@@ -1,4 +1,5 @@
 import type { ZfyMiddlewareType } from '../types'
+import { createJSONStorage } from 'zustand/middleware'
 
 import { data, SyncStorage, rehydratedData, assertStoreContent } from '.'
 import createStore from '../core/create-store'
@@ -83,7 +84,7 @@ describe('🐣 Core > createStore():', () => {
       subscribe: true,
     })
     const unsubscribe = store.subscribeWithSelector?.(
-      (state) => state.data.file,
+      (state: any) => state.data.file,
       listener,
       { fireImmediately: true }
     )
@@ -109,11 +110,11 @@ describe('🐣 Core > createStore():', () => {
     )
     // @ts-expect-error
     expect(() => createStore('jest', data, { persist: {} })).toThrow(
-      "You need to provide the getStorage() function to jest's createStore() options.persist."
+      "You need to provide the storage to jest's createStore() options.persist."
     )
 
     const store = createStore('jest', data, {
-      persist: { getStorage: () => SyncStorage },
+      persist: { storage: createJSONStorage(() => SyncStorage) },
     })
     assertStoreContent({ store, expectedData: rehydratedData })
 
@@ -126,12 +127,12 @@ describe('🐣 Core > createStore():', () => {
     const consoleDebug = jest.spyOn(console, 'debug').mockImplementation()
 
     const store = createStore<StoreDataType>('jest', data, {
-      persist: { getStorage: () => SyncStorage },
+      persist: { storage: createJSONStorage(() => SyncStorage) },
       subscribe: true,
       log: true,
     })
     const unsubscribe = store.subscribeWithSelector?.(
-      (state) => state.data.file,
+      (state: any) => state.data.file,
       listener
     )
 
@@ -180,9 +181,9 @@ describe('🐣 Core > createStore():', () => {
   it('works with customMiddlewares provided', () => {
     const fn = jest.fn()
     const customMiddleware: ZfyMiddlewareType<StoreDataType> =
-      (storeName, config) => (set, get, api) =>
+      (storeName, config) => (set: any, get: any, api: any) =>
         config(
-          (args) => {
+          (args: any) => {
             set(args)
             fn(storeName)
           },
@@ -192,7 +193,7 @@ describe('🐣 Core > createStore():', () => {
 
     const store = createStore('jest', data, {
       log: true,
-      persist: { getStorage: () => SyncStorage },
+      persist: { storage: createJSONStorage(() => SyncStorage) },
       customMiddlewares: [customMiddleware],
     })
 

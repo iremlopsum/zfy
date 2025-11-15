@@ -1,6 +1,7 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 import { render, waitFor } from '@testing-library/react-native'
+import { createJSONStorage } from 'zustand/middleware'
 
 import { data, sleep, SyncStorage, AsyncStorage, rehydratedData } from '.'
 import PersistGate from '../core/PersistGate'
@@ -10,7 +11,7 @@ describe('🚪 Core > PersistGate:', () => {
   it('renders loader and rehydrates with sync storage', async () => {
     const loader = jest.fn()
     const store = createStore('jest', data, {
-      persist: { getStorage: () => SyncStorage },
+      persist: { storage: createJSONStorage(() => SyncStorage) },
     })
 
     const { toJSON } = await waitFor(() =>
@@ -33,7 +34,7 @@ describe('🚪 Core > PersistGate:', () => {
   it('renders loader and rehydrates with async storage', async () => {
     const loader = jest.fn()
     const store = createStore('jest', data, {
-      persist: { getStorage: () => AsyncStorage },
+      persist: { storage: createJSONStorage(() => AsyncStorage) },
     })
 
     // FIXME: Fix act issue:

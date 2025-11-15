@@ -75,7 +75,7 @@ export function validateOptionsForPersistence<StoreDataType>(
   invariant(
     !options ||
       (typeof options === 'object' && options.persist === undefined) ||
-      typeof options?.persist?.getStorage === 'function',
-    `You need to provide the getStorage() function to ${storeName}'s createStore() options.persist.`
+      typeof options?.persist?.storage !== 'undefined',
+    `You need to provide the storage to ${storeName}'s createStore() options.persist.`
   )
 }

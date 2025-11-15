@@ -1,17 +1,13 @@
 import type {
-  EqualityChecker,
-  StateListener,
-  StateSelector,
-  StateSliceListener,
-  StoreApi,
-} from 'zustand'
-import type { StoreApiWithSubscribeWithSelector } from 'zustand/middleware'
-
-import type {
   StoreType,
   CreateStoreConfigType,
   CreateStoreOptionsType,
 } from '../../types'
+
+// Custom types for middleware
+type StateListener<T> = (state: T, prevState: T) => void
+type StateSelector<T, U> = (state: T) => U
+type StateSliceListener<T> = (slice: T, previousSlice: T) => void
 
 // NOTE: Adapted from https://github.com/pmndrs/zustand/blob/main/src/middleware/subscribeWithSelector.ts.
 const middleware =
@@ -19,35 +15,42 @@ const middleware =
     _: string,
     config: CreateStoreConfigType<StoreDataType>,
     __?: CreateStoreOptionsType<StoreDataType>
-  ): CreateStoreConfigType<
-    StoreDataType,
-    StoreApi<StoreType<StoreDataType>> & {
-      subscribeWithSelector: StoreApiWithSubscribeWithSelector<
-        StoreType<StoreDataType>
-      >['subscribe']
-    }
-  > =>
+  ): CreateStoreConfigType<StoreDataType> =>
   (set, get, api): StoreType<StoreDataType> => {
     const deprecatedSubscribe = api.subscribe
 
-    // @ts-expect-error FIXME: Deprecated subscribe signature missing.
-    api.subscribeWithSelector = <StateSlice>(
+    const apiWithSubscribeWithSelector = api as typeof api & {
+      subscribeWithSelector: <StateSlice>(
+        selector: StateSelector<StoreType<StoreDataType>, StateSlice>,
+        providedListener: StateSliceListener<StateSlice>,
+        options?:
+          | {
+              equalityFn?: (a: StateSlice, b: StateSlice) => boolean
+              fireImmediately?: boolean
+            }
+          | undefined
+      ) => () => void
+    }
+
+    apiWithSubscribeWithSelector.subscribeWithSelector = <StateSlice>(
       selector: StateSelector<StoreType<StoreDataType>, StateSlice>,
       providedListener: StateSliceListener<StateSlice>,
       options?:
         | {
-            equalityFn?: EqualityChecker<StateSlice>
+            equalityFn?: (a: StateSlice, b: StateSlice) => boolean
             fireImmediately?: boolean
           }
         | undefined
     ) => {
-      let listener: StateListener<StoreType<StoreDataType>> = selector
+      let listener: StateListener<StoreType<StoreDataType>> = (
+        state: StoreType<StoreDataType>
+      ) => selector(state) as any
 
       if (providedListener) {
         const equalityFn = options?.equalityFn || Object.is
-        let currentSlice = selector(api.getState())
+        let currentSlice = selector(apiWithSubscribeWithSelector.getState())
 
-        listener = (state) => {
+        listener = (state: StoreType<StoreDataType>) => {
           const nextSlice = selector(state)
           if (!equalityFn(currentSlice, nextSlice)) {
             const previousSlice = currentSlice
@@ -63,7 +66,7 @@ const middleware =
       return deprecatedSubscribe(listener)
     }
 
-    return config(set, get, api)
+    return config(set, get, apiWithSubscribeWithSelector as any)
   }
 
 export default middleware

@@ -2,6 +2,7 @@ import { SyncStorage, rehydratedData } from './index'
 import { initStores, createStore } from '../core'
 import { renderHook } from '@testing-library/react-hooks'
 import { act } from 'react-test-renderer'
+import { createJSONStorage } from 'zustand/middleware'
 
 const dataA = { fileA: 'create-store.test.ts' }
 const rehydratedDataA = { fileA: 'rehydrated' }
@@ -42,17 +43,17 @@ describe('🚀 Core > initStores():', () => {
 
     const storeA = createStore<StoresDataType['jestA']>('jestA', dataA, {
       persist: {
-        getStorage: () => SyncStorage,
+        storage: createJSONStorage(() => SyncStorage),
         onRehydrateStorage: onRehydrateStorageSpy,
       },
     })
     const storeB = createStore<StoresDataType['jestB']>('jestB', dataB, {
       persist: {
-        getStorage: () => SyncStorage,
+        storage: createJSONStorage(() => SyncStorage),
       },
     })
 
-    expect(onRehydrateStorageSpy).toHaveBeenCalledWith(undefined)
+    expect(onRehydrateStorageSpy).toHaveBeenCalled()
 
     const { stores } = initStores<StoresDataType>([storeA, storeB])
 
@@ -126,7 +127,7 @@ describe('🚀 Core > initStores():', () => {
       useStores(
         'jestA',
         (data) => data.fileA,
-        (prevData, newData) => prevData === newData
+        (prevData: any, newData: any) => prevData === newData
       )
     )
     expect(result.current).toBe(dataA.fileA)

@@ -1,4 +1,5 @@
 import { renderHook } from '@testing-library/react-hooks'
+import { createJSONStorage } from 'zustand/middleware'
 
 import createStore from '../core/create-store'
 import useRehydrate from '../core/use-rehydrate'
@@ -11,7 +12,7 @@ describe('💧 Core > useRehydrate():', () => {
    */
   it('rehydrates with sync storage', async () => {
     const store = createStore('jest', data, {
-      persist: { getStorage: () => SyncStorage },
+      persist: { storage: createJSONStorage(() => SyncStorage) },
     })
 
     const { result, waitForNextUpdate } = renderHook(() =>
@@ -34,7 +35,7 @@ describe('💧 Core > useRehydrate():', () => {
    */
   it('rehydrates with async storage', async () => {
     const store = createStore('jest', data, {
-      persist: { getStorage: () => AsyncStorage },
+      persist: { storage: createJSONStorage(() => AsyncStorage) },
     })
 
     const { result, waitForNextUpdate } = renderHook(() =>
