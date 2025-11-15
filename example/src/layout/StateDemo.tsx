@@ -93,11 +93,11 @@ export function StateDemo({ theme }: StateDemoProps) {
   }
 
   const resetUser = () => {
-    userStore().reset()
+    userStore.getState().reset()
   }
 
   const resetPreferences = () => {
-    preferencesStore().reset()
+    preferencesStore.getState().reset()
   }
 
   const storeCode = `import { createStore } from '@colorfy-software/zfy';
