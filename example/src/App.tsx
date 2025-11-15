@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
+import { PersistGate } from '@colorfy-software/zfy'
 
 import { Hero } from './layout/Hero'
 import { Footer } from './layout/Footer'
 import { Features } from './layout/Features'
 import { StateDemo } from './layout/StateDemo'
+import { LoadingScreen } from './layout/LoadingScreen'
 
 import themeStore from './stores/theme-store'
 import preferencesStore from './stores/preferences-store'
@@ -35,19 +37,21 @@ export default function App() {
   }, [])
 
   return (
-    <div
-      className={`min-h-screen transition-colors duration-300 ${
-        theme === 'dark'
-          ? 'bg-zinc-950 text-zinc-100'
-          : 'bg-zinc-50 text-zinc-900'
-      }`}
-    >
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <Hero theme={theme} />
-        <Features theme={theme} />
-        <StateDemo theme={theme} />
-        <Footer theme={theme} />
+    <PersistGate stores={[preferencesStore]} loader={<LoadingScreen />}>
+      <div
+        className={`min-h-screen transition-colors duration-300 ${
+          theme === 'dark'
+            ? 'bg-zinc-950 text-zinc-100'
+            : 'bg-zinc-50 text-zinc-900'
+        }`}
+      >
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          <Hero theme={theme} />
+          <Features theme={theme} />
+          <StateDemo theme={theme} />
+          <Footer theme={theme} />
+        </div>
       </div>
-    </div>
+    </PersistGate>
   )
 }
