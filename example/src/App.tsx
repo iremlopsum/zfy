@@ -1,43 +1,53 @@
-import userStore from './stores/user-store'
+import { useEffect } from 'react'
 
-const updateLikes = userStore.getState().update
+import { Hero } from './layout/Hero'
+import { Footer } from './layout/Footer'
+import { Features } from './layout/Features'
+import { StateDemo } from './layout/StateDemo'
 
-const App = () => {
-  const likes = userStore((data) => data.likes)
+import themeStore from './stores/theme-store'
+import preferencesStore from './stores/preferences-store'
+
+const updatePreferences = preferencesStore.getState().update
+
+export default function App() {
+  const theme = themeStore((data) => data.theme)
+
+  useEffect(() => {
+    // Apply or remove the 'dark' class on the root element
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [theme])
+
+  useEffect(() => {
+    // Increment visit count on mount
+    // Wait for store to be hydrated before incrementing
+    const timer = setTimeout(() => {
+      updatePreferences((state) => {
+        state.visitCount++
+      })
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Likes: {likes}
-          </h1>
-          <p className="text-lg text-gray-600 mb-8">
-            This is a simple example of how to use Zfy to manage state in a
-            React application.
-          </p>
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2"
-            onClick={() => updateLikes((data) => (data.likes = data.likes + 1))}
-          >
-            Increment
-          </button>
-          <button
-            className="bg-red-500 text-white px-4 py-2 rounded-md mr-2"
-            onClick={() => updateLikes((data) => (data.likes = data.likes - 1))}
-          >
-            Decrement
-          </button>
-          <button
-            className="bg-gray-500 text-white px-4 py-2 rounded-md"
-            onClick={() => updateLikes((data) => (data.likes = 0))}
-          >
-            Reset
-          </button>
-        </div>
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        theme === 'dark'
+          ? 'bg-zinc-950 text-zinc-100'
+          : 'bg-zinc-50 text-zinc-900'
+      }`}
+    >
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <Hero theme={theme} />
+        <Features theme={theme} />
+        <StateDemo theme={theme} />
+        <Footer theme={theme} />
       </div>
     </div>
   )
 }
-
-export default App

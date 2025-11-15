@@ -1,15 +1,18 @@
-import { createStore } from '../../../src/index'
+import { createStore } from '@colorfy-software/zfy'
 
-interface StoresDataType {
-  user: {
-    likes: number
-  }
+interface UserState {
+  name: string
+  age: number
 }
 
-export const initialState: StoresDataType['user'] = {
-  likes: 0,
+// Initial user data
+const initialUserData: UserState = {
+  name: 'Alice',
+  age: 25,
 }
 
-export default createStore<StoresDataType['user']>('user', initialState, {
-  log: true,
-})
+// Create the user store with the library
+const userStore = createStore<UserState>('user', initialUserData)
+
+// Default export the store instance
+export default userStore
