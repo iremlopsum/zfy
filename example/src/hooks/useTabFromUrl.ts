@@ -27,4 +27,3 @@ export function useTabFromUrl(defaultTab: TabValue = 'user') {
 
   return [selectedTab, setSelectedTab] as const
 }
-

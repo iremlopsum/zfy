@@ -9,4 +9,3 @@ export const getThemeBgClass = (
   darkClass = 'bg-zinc-950',
   lightClass = 'bg-zinc-100'
 ) => (theme === 'dark' ? darkClass : lightClass)
-

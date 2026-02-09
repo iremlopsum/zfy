@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { PersistGate } from '@colorfy-software/zfy'
+import { PersistGate } from '@iremlopsum/zfy'
 
 import { Hero } from './layout/Hero'
 import { Footer } from './layout/Footer'

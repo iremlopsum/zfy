@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://colorfy-software.gitbook.io/zfy" target="_blank" rel="noopener noreferrer">
+  <a href="https://iremlopsum.github.io/zfy" target="_blank" rel="noopener noreferrer">
     🧸 zfy
   </a>
 </h1>
@@ -9,50 +9,50 @@
 </h4>
 
 <p align="center">
-  <a href="https://github.com/colorfy-software/zfy/actions" target="_blank" rel="noopener noreferrer">
-    <img src="https://github.com/colorfy-software/zfy/workflows/Test%20Suite/badge.svg?branch=main" alt="Current GitHub Actions build status" />
+  <a href="https://github.com/iremlopsum/zfy/actions" target="_blank" rel="noopener noreferrer">
+    <img src="https://github.com/iremlopsum/zfy/workflows/Test%20Suite/badge.svg?branch=main" alt="Current GitHub Actions build status" />
   </a>
-  <a href="https://www.npmjs.org/package/@colorfy-software/zfy" target="_blank" rel="noopener noreferrer">
-    <img src="https://badge.fury.io/js/%40colorfy-software%2Fzfy.svg" alt="npm version" height="18"/>
+  <a href="https://www.npmjs.org/package/@iremlopsum/zfy" target="_blank" rel="noopener noreferrer">
+    <img src="https://badge.fury.io/js/%40iremlopsum%2Fzfy.svg" alt="npm version" height="18"/>
   </a>
-  <a href="https://www.npmjs.org/package/@colorfy-software/zfy" target="_blank" rel="noopener noreferrer">
-    <img src="https://img.shields.io/npm/dm/@colorfy-software/zfy.svg?maxAge=2592000" alt="Monthly npm downloads" />
+  <a href="https://www.npmjs.org/package/@iremlopsum/zfy" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.shields.io/npm/dm/@iremlopsum/zfy.svg?maxAge=2592000" alt="Monthly npm downloads" />
   </a>
-  <a href="https://colorfy-software.gitbook.io/@colorfy-software/zfy/contributing" target="_blank" rel="noopener noreferrer">
+  <a href="https://github.com/iremlopsum/zfy/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
   </a>
 </p>
 
+> **Note:** This is a maintained fork of [`@colorfy-software/zfy`](https://github.com/colorfy-software/zfy), originally created by [Charles Mangwa](https://github.com/CharlesMangwa) at [colorfy](https://colorfy.me).
+
 ## 🎯 Purpose
 
-[zustand](https://github.com/pmndrs/zustand) is a library that keeps state management as simple as you would have always loved it to be. zfy has been built on top of it to provide [a useful set of tools](https://colorfy-software.gitbook.io/zfy/#features) to make that experience even
-more delightful.
+[zustand](https://github.com/pmndrs/zustand) is a library that keeps state management as simple as you would have always loved it to be. zfy has been built on top of it to provide a useful set of tools to make that experience even more delightful.
 
 ## 🏗️ Installation
 
 ```sh
-yarn add @colorfy-software/zfy
+yarn add @iremlopsum/zfy
+```
+
+or
+
+```sh
+npm install @iremlopsum/zfy
 ```
 
 ## 📚 Documentation
 
-The doc is accessible at https://colorfy-software.gitbook.io/zfy.
-
-- The best way to learn is to follow the [guides](https://colorfy-software.gitbook.io/zfy/guides/creating-and-using-a-store). They will help you to get up and running in no time.
-- The [API reference](https://colorfy-software.gitbook.io/zfy/api/types) lists all public APIs.
-- Quick reference: See [API_REFERENCE.md](./API_REFERENCE.md) for code examples and usage patterns.
+- **[Live Demo](https://iremlopsum.github.io/zfy)** — Interactive example showcasing zfy features
+- **[API Reference](./API_REFERENCE.md)** — Code examples and usage patterns
 
 ## 🤝 Contributing
 
-This library is a very opinionated approach to using zustand that the team uses at colorfy.
+Contributions are welcome! See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
 
-**Therefore, we might not consider requests that do not align with our goals/vision/use cases for zfy**.
+## 🙏 Acknowledgments
 
-However, feel free to voice your opinions if need be: our position might change!
-
-You can also consider doing so [_from the inside_](https://colorfy.me/team/) 👀…
-
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+This project is a fork of [`@colorfy-software/zfy`](https://github.com/colorfy-software/zfy), originally created by [Charles Mangwa](https://github.com/CharlesMangwa) and the team at [colorfy](https://colorfy.me). Thank you for the excellent foundation!
 
 ## 📰 License
 

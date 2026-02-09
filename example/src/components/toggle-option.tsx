@@ -34,4 +34,3 @@ export function ToggleOption({
     </div>
   )
 }
-

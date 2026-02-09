@@ -1,5 +1,4 @@
 import { Loader2 } from 'lucide-react'
-import { useEffect } from 'react'
 
 export function LoadingScreen() {
   return (

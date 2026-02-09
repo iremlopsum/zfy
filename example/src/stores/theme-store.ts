@@ -1,4 +1,4 @@
-import { createStore } from '@colorfy-software/zfy'
+import { createStore } from '@iremlopsum/zfy'
 
 interface ThemeState {
   theme: 'light' | 'dark'

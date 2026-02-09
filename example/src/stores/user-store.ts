@@ -1,4 +1,4 @@
-import { createStore } from '@colorfy-software/zfy'
+import { createStore } from '@iremlopsum/zfy'
 
 interface UserState {
   name: string

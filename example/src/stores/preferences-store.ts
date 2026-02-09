@@ -1,6 +1,6 @@
 import { createJSONStorage } from 'zustand/middleware'
 
-import { createStore } from '@colorfy-software/zfy'
+import { createStore } from '@iremlopsum/zfy'
 
 interface PreferencesState {
   autoSave: boolean

@@ -1,5 +1,5 @@
 {
-  "name": "@colorfy-software/zfy",
+  "name": "@iremlopsum/zfy",
   "version": "1.0.0",
   "description": "Useful helpers for state management in React with zustand",
   "main": "lib/commonjs/index",
@@ -31,14 +31,17 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/colorfy-software/zfy.git"
+    "url": "git+https://github.com/iremlopsum/zfy.git"
   },
-  "author": "Charles Mangwa <charles.m@hey.com> (https://github.com/CharlesMangwa)",
+  "author": "Kristjan Vool <kristjan@iremlopsum.dev> (https://github.com/iremlopsum)",
+  "contributors": [
+    "Charles Mangwa <charles.m@hey.com> (https://github.com/CharlesMangwa)"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/colorfy-software/zfy/issues"
+    "url": "https://github.com/iremlopsum/zfy/issues"
   },
-  "homepage": "https://colorfy-software.gitbook.io/zfy",
+  "homepage": "https://iremlopsum.github.io/zfy",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"

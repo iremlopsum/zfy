@@ -10,7 +10,7 @@ interface DemoHeaderProps {
   onToggleCode: () => void
 }
 
-export function DemoHeader({ theme, showCode, onToggleCode }: DemoHeaderProps) {
+export function DemoHeader({ theme, onToggleCode }: DemoHeaderProps) {
   return (
     <div className="flex items-center justify-center gap-3 mb-8">
       <h2

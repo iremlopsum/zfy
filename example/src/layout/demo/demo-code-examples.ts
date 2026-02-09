@@ -1,4 +1,4 @@
-export const storeCode = `import { createStore } from '@colorfy-software/zfy';
+export const storeCode = `import { createStore } from '@iremlopsum/zfy';
 import { createJSONStorage } from 'zustand/middleware';
 
 // User Store

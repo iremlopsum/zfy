@@ -26,7 +26,7 @@ export function Footer({ theme }: FooterProps) {
       </div>
       <div className="flex items-center justify-center gap-6">
         <a
-          href="https://github.com/colorfy-software/zfy"
+          href="https://github.com/iremlopsum/zfy"
           target="_blank"
           rel="noopener noreferrer"
           className={`flex items-center gap-2 transition-colors ${
@@ -39,7 +39,7 @@ export function Footer({ theme }: FooterProps) {
           <span>GitHub</span>
         </a>
         <a
-          href="https://colorfy-software.gitbook.io/zfy"
+          href="https://github.com/iremlopsum/zfy#readme"
           target="_blank"
           rel="noopener noreferrer"
           className={`transition-colors ${
@@ -51,7 +51,7 @@ export function Footer({ theme }: FooterProps) {
           Documentation
         </a>
         <a
-          href="https://www.npmjs.com/package/@colorfy-software/zfy"
+          href="https://www.npmjs.com/package/@iremlopsum/zfy"
           target="_blank"
           rel="noopener noreferrer"
           className={`transition-colors ${
