@@ -5,7 +5,7 @@
 ### Creating a Store
 
 ```typescript
-import { createStore } from '@colorfy-software/zfy'
+import { createStore } from '@iremlopsum/zfy'
 
 interface UserData {
   name: string
@@ -85,7 +85,7 @@ userStore.getState().reset()
 ### Using Multiple Stores with initStores
 
 ```typescript
-import { initStores, createStore } from '@colorfy-software/zfy'
+import { initStores, createStore } from '@iremlopsum/zfy'
 
 const userStore = createStore('user', { name: 'John', likes: 0 })
 const settingsStore = createStore('settings', { theme: 'dark', notifications: true })
@@ -113,7 +113,7 @@ function MyComponent() {
 ### With Persistence
 
 ```typescript
-import { createStore } from '@colorfy-software/zfy'
+import { createStore } from '@iremlopsum/zfy'
 import { createJSONStorage } from 'zustand/middleware'
 
 const userStore = createStore(
@@ -167,7 +167,7 @@ function MyComponent() {
 Wait for stores to rehydrate before rendering your app:
 
 ```typescript
-import { PersistGate } from '@colorfy-software/zfy'
+import { PersistGate } from '@iremlopsum/zfy'
 
 function App() {
   return (
@@ -186,7 +186,7 @@ function App() {
 Check rehydration status programmatically:
 
 ```typescript
-import { useRehydrate } from '@colorfy-software/zfy'
+import { useRehydrate } from '@iremlopsum/zfy'
 
 function MyComponent() {
   const isRehydrated = useRehydrate([userStore, settingsStore])
@@ -255,7 +255,7 @@ const invalid = userStore((data) => data.invalid) // ❌ TypeScript error
 ## Full Example
 
 ```typescript
-import { createStore } from '@colorfy-software/zfy'
+import { createStore } from '@iremlopsum/zfy'
 
 // Define your data type
 interface CounterData {

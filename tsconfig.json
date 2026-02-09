@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@colorfy-software/zfy": ["./src/index"]
+      "@iremlopsum/zfy": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
