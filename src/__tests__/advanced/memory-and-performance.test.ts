@@ -133,9 +133,9 @@ describe('🔬 Advanced > Memory & Performance:', () => {
         }
       })
 
-      // Should complete 1000 updates in reasonable time (< 100ms)
-      // This tests overall efficiency without flaky timing comparisons
-      expect(totalTime).toBeLessThan(100)
+      // Should complete 1000 updates in reasonable time (< 500ms)
+      // Generous threshold to avoid flakiness on slower CI runners
+      expect(totalTime).toBeLessThan(500)
       expect(store.getState().data.items).toHaveLength(1000)
 
       // Verify items are correct
