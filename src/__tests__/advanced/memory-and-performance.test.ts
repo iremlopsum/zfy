@@ -113,9 +113,9 @@ describe('🔬 Advanced > Memory & Performance:', () => {
         }
       })
 
-      // Performance should not degrade significantly (within 2x)
-      // More lenient threshold to avoid flakiness
-      expect(secondBatch).toBeLessThan(firstBatch * 2)
+      // Performance should not degrade significantly (within 2x, min 50ms floor)
+      // The floor prevents false failures when both batches are very fast (<10ms)
+      expect(secondBatch).toBeLessThan(Math.max(firstBatch * 2, 50))
       expect(store.getState().data.count).toBe(1999)
     })
 

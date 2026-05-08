@@ -51,7 +51,7 @@ export function Footer({ theme }: FooterProps) {
           Documentation
         </a>
         <a
-          href="https://www.npmjs.com/package/@iremlopsum/zfy"
+          href="https://github.com/iremlopsum/zfy/blob/main/API_REFERENCE.md"
           target="_blank"
           rel="noopener noreferrer"
           className={`transition-colors ${
