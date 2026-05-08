@@ -295,7 +295,4 @@ function Counter() {
 }
 ```
 
-## More Information
-
-For comprehensive guides and additional examples, visit the [official documentation](https://colorfy-software.gitbook.io/zfy).
 
